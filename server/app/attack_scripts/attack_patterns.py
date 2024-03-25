@@ -64,7 +64,7 @@ def port_scan(target_ip):
 def main():
 	ul = ["root", "admin", "root"]
 	pl = ["password","12345678"]
-	brute_force_attack("localhost", "2222", ul, pl)
+	brute_force_attack("localhost", "22", ul, pl)
 	#port_scan("192.168.1.41")
 	#execute_command("192.168.1.41", "22", "user", "password", "echo 'hola'")
 

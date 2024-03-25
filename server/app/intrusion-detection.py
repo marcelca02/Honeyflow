@@ -1,15 +1,23 @@
 import pyshark as psh
 
 SSH_PORT = 22
+INTERFACE = 'wlp2s0'
 
-def ssh_brute_force_detection(pcap_file):
-    cap = psh.FileCapture(pcap_file, display_filter='tcp.port == 22')
+def ssh_brute_force_detection(timeout):
+    print("Starting packet capture\n")
 
+    cap = psh.LiveCapture(interface=INTERFACE, bpf_filter=f"port {SSH_PORT}")
+    cap.sniff(timeout=timeout)
+    packets = [pkt for pkt in cap._packets]
+    cap.close()
+        
     failed_attempts = {}
 
-    for pkt in cap:
+    print("Starting packet analysis: \n")
+    for pkt in packets:
         try:
-            if pkt.ssh:
+            if hasattr(pkt, 'ssh'):
+                print("SSH packet detected")
                 src_ip = pkt.ip.src
                 if pkt.ssh.response_code == 'Failure':
                     if src_ip in failed_attempts:
@@ -25,8 +33,6 @@ def ssh_brute_force_detection(pcap_file):
         except AttributeError:
             pass    # Ignore packets that are not SSH
 
-    cap.close()
-
-ssh_brute_force_detection('../data/demo.pcap')
+ssh_brute_force_detection(10)
 
 
