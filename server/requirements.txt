@@ -11,3 +11,5 @@ pyshark==0.6
 scapy==2.5.0
 termcolor==2.4.0
 Werkzeug==3.0.1
+paramiko
+colorama
