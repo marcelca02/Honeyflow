@@ -1,0 +1,8 @@
+#Create network
+sudo docker network create -d bridge honeypot-network
+
+#Docker build with Dockerfile
+sudo docker build -t honeypot1:v1 .
+
+#Docker run
+sudo docker run -it --network=honeypot-network honeypot1:v1 --name cowrie

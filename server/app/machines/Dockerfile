@@ -1,19 +1,21 @@
 FROM ubuntu:22.04
 
-RUN apt update && apt install -y openssh-server sudo
+# Copiar el script al contenedor
+COPY install_cowrie.sh /tmp/install_cowrie.sh
+RUN chmod +x /tmp/install_cowrie.sh
 
-# Script de instalación y configuración de cowrie
-COPY cowrie-script.sh /tmp/cowrie-script.sh
-RUN chmod +x /tmp/cowrie-script.sh
-RUN /tmp/cowrie-script.sh
+# Ejecutar el script Bash de instalación básica de Cowrie
+RUN /tmp/install_cowrie.sh
 
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
-RUN useradd -m -s /bin/bash user 
-RUN echo "user:password-user" | chpasswd && adduser user sudo
-
+# Exponer los puertos necesarios para Cowrie
 EXPOSE 2222
+EXPOSE 22
 
-ENTRYPOINT service ssh start && bash
+COPY restart_cowrie.sh /tmp/restart_cowrie.sh
+RUN chmod +x /tmp/restart_cowrie.sh
 
-CMD [".", "/home/cowrie/cowrie/cowrie-env/bin/activate"]
+COPY entry_point.sh /tmp/entry_point.sh
+RUN chmod +x /tmp/entry_point.sh
+
+# Entrypoint para ejecutar el script de reinicio de Cowrie, para que se aplique el puerto 22, y lanzar una shell
+ENTRYPOINT ["/tmp/entry_point.sh"]
