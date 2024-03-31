@@ -1,7 +1,6 @@
 import pyshark as psh
+from config import INTERFACE, SSH_PORT, CONTAINER_IP 
 
-SSH_PORT = 22
-INTERFACE = 'wlp2s0'
 
 def ssh_brute_force_detection(timeout):
     print("Starting packet capture\n")
@@ -11,28 +10,27 @@ def ssh_brute_force_detection(timeout):
     packets = [pkt for pkt in cap._packets]
     cap.close()
         
-    failed_attempts = {}
+    attempts = {}
 
     print("Starting packet analysis: \n")
     for pkt in packets:
         try:
             if hasattr(pkt, 'ssh'):
-                print("SSH packet detected")
                 src_ip = pkt.ip.src
-                if pkt.ssh.response_code == 'Failure':
-                    if src_ip in failed_attempts:
-                        failed_attempts[src_ip] += 1
-                    else:
-                        failed_attempts[src_ip] = 1
-                        failed_attempts[src_ip]['time'] = pkt.sniff_time.timestamp()
-
-                        # If the number of failed attempts exceeds 5 within a 1-minute window
-                        if failed_attempts[src_ip] >= 5 and pkt.sniff_time.timestamp() - failed_attempts[src_ip]['time'] <= 60:
-                            print(f"SSH brute force detected from {src_ip}")
+                print(f"SSH packet from {src_ip}")
+                if src_ip in attempts and src_ip != CONTAINER_IP:
+                    attempts[src_ip]['attempts'] += 1
+                    # If the number of failed attempts exceeds 5 within a 1-minute window
+                    if attempts[src_ip]['attempts'] >= 5 and pkt.sniff_time.timestamp() - attempts[src_ip]['time'] <= 60:
+                        print(f"SSH brute force detected from {src_ip}")
+                        break
+                else:
+                    attempts[src_ip] = {'attempts': 1, 'time': pkt.sniff_time.timestamp()}
 
         except AttributeError:
             pass    # Ignore packets that are not SSH
 
-ssh_brute_force_detection(10)
+ssh_brute_force_detection(20)
+
 
 
