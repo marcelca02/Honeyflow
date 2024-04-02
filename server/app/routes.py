@@ -1,6 +1,12 @@
-import os
-from app import app
+from flask import Blueprint, render_template
 
-@app.route('/')
-def hello():
-    return "Hello, World!"
+
+routes = Blueprint('routes', __name__)
+
+@routes.route('/')
+def home():
+    return render_template('index.html')
+
+@routes.route('/deploy_honeypot')
+def deploy_honeypot():
+    return render_template('deploy_honeypot.html')
