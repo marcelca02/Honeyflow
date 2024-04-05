@@ -14,7 +14,7 @@ def crear_docker_network():
 
 def construir_docker_image():
     # Cambiar al directorio donde se encuentra el Dockerfile
-    ruta_dockerfile = "/home/pablofc18/Desktop/Honeyflow/server/app/machines"
+    ruta_dockerfile = "./machines"
     os.chdir(ruta_dockerfile)
 
     # Construir la imagen si no existe
