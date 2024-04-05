@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-<h1>DEPLOY</h1>
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+      <div class="container-fluid py-5">
+        <p class="col-md-8 fs-4">Pulsa para DESPLEGAR el honeypot</p>
+        <form action="/ejecutar_docker" method="post">
+            <button type="submit" class="btn-primary btn btn-lg">Desplegar</button>
+        </form>
+      </div>
+    </div>
 
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+      <div class="container-fluid py-5">
+
+        {% if docker_running %}
+            <p class="col-md-8 fs-4">Pulsa para PARAR el honeypot</p>
+            <form action="/stop_docker" method="post">
+                <button type="submit" class="btn-primary btn btn-lg">Stop</button>
+            </form>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                ¡El docker del honeypot no esta corriendo!
+            </div>
+        {% endif %}
+      </div>
+    </div>
+
+{% endblock %}
