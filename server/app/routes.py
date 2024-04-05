@@ -1,25 +1,24 @@
 import subprocess
 #import docker
-from flask import Blueprint, render_template, request
-
-
-routes = Blueprint('routes', __name__)
+from flask import render_template, request, json
+from app import app
+from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
+from app.db import DBMethods
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running = False
 
-
-@routes.route('/')
+@app.route('/')
 def home():
     return render_template('index.html')
 
 
-@routes.route('/deploy_honeypot')
+@app.route('/deploy_honeypot')
 def deploy_honeypot():
     return render_template('deploy_honeypot.html')
 
 
-@routes.route('/ejecutar_docker', methods=['POST'])
+@app.route('/ejecutar_docker', methods=['POST'])
 def ejecutar_docker():
     global docker_running # indicamos que se usa la variable global
     proceso = subprocess.run(['python3', 'run_docker_cowrie.py'])
@@ -31,12 +30,12 @@ def ejecutar_docker():
         return render_template('resultado_honeypot.html', deploy=True, exito=False)
 
 
-@routes.route('/stop_honeypot')
+@app.route('/stop_honeypot')
 def stop_honeypot():
     return render_template('stop_honeypot.html', docker_running=docker_running)
 
 
-@routes.route('/stop_docker', methods=['POST'])
+@app.route('/stop_docker', methods=['POST'])
 def stop_docker():
     global docker_running
     # de momento solo habra un resultado solo uno corriendo
