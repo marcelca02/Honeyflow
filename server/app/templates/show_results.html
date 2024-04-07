@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col">
+    <h2>Resultados del Análisis</h2>
+    <p>Aquí se muestran los resultados del análisis:</p>
+    <button type="submit" class="btn-primary btn btn-lg" onclick="mostrarResultados()">Mostrar Resultados</button>
+    <div id="resultado-analisis">
+        <!-- Aquí se mostrarán los resultados -->
+    </div>
+  </div>
+</div>
+
+<script>
+    function mostrarResultados() {
+        fetch('/show_results')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resultado-analisis').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error al obtener los resultados:', error));
+    }
+</script>
+{% endblock %}

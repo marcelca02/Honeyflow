@@ -1,9 +1,12 @@
 import subprocess
 #import docker
-from flask import render_template, request, json
+import json
+import os
+from flask import render_template, request, jsonify, abort
 from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
+import plotly.graph_objs as go
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running = False
@@ -47,3 +50,28 @@ def stop_docker():
         return render_template('resultado_honeypot.html', deploy=False, exito=True)
     else:
         return render_template('resultado_honeypot.html', deploy=False, exito=False)
+
+
+@app.route('/show_results')
+def show_results():
+    # Aquí puedes definir el JSON que deseas pasar
+    # En este ejemplo, estoy pasando un JSON simple como un diccionario de Python
+    #os.path.join('JSON DIRECTORY', 'json file')
+   
+   json_file_path = os.path.join( '/home/arnau/Honeyflow/server/app', 'test.json')
+
+   # Verificar si el archivo existe
+   if os.path.exists(json_file_path):
+        # Leer el contenido del archivo JSON
+        with open(json_file_path, 'r') as json_file:
+            datos_json = json.load(json_file)
+        return jsonify(datos_json)
+   else:
+        # Verifica si el archivo JSON existe
+        # Devuelve un código de estado HTTP 404 y un mensaje personalizado
+
+        return render_template('error.html'), 404
+
+@app.route('/show_attacks')
+def show_attacks():
+    return render_template('show_results.html')
