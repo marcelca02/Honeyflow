@@ -14,7 +14,7 @@ def crear_docker_network():
 
 def construir_docker_image():
     # Cambiar al directorio donde se encuentra el Dockerfile
-    ruta_dockerfile = "./machines"
+    ruta_dockerfile = "./app/machines"
     os.chdir(ruta_dockerfile)
 
     # Construir la imagen si no existe

@@ -24,7 +24,7 @@ def deploy_honeypot():
 @app.route('/ejecutar_docker', methods=['POST'])
 def ejecutar_docker():
     global docker_running # indicamos que se usa la variable global
-    proceso = subprocess.run(['python3', 'run_docker_cowrie.py'])
+    proceso = subprocess.run(['python3', 'app/run_docker_cowrie.py'])
     if proceso.returncode == 0:
         docker_running = True
         return render_template('resultado_honeypot.html', deploy=True, exito=True)
