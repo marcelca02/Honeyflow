@@ -65,13 +65,9 @@ def show_results():
         # Leer el contenido del archivo JSON
         with open(json_file_path, 'r') as json_file:
             datos_json = json.load(json_file)
-        return jsonify(datos_json)
+        return render_template('show_results.html', datos=datos_json)
    else:
         # Verifica si el archivo JSON existe
         # Devuelve un código de estado HTTP 404 y un mensaje personalizado
 
         return render_template('error.html'), 404
-
-@app.route('/show_attacks')
-def show_attacks():
-    return render_template('show_results.html')
