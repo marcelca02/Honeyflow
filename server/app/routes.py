@@ -58,7 +58,7 @@ def show_results():
     # En este ejemplo, estoy pasando un JSON simple como un diccionario de Python
     #os.path.join('JSON DIRECTORY', 'json file')
    
-   json_file_path = os.path.join( '/home/arnau/Honeyflow/server/app', 'test.json')
+   json_file_path = os.path.join ('app', 'test.json')
 
    # Verificar si el archivo existe
    if os.path.exists(json_file_path):
