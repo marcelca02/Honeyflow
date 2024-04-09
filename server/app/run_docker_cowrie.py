@@ -36,7 +36,7 @@ def ejecutar_o_iniciar_docker_container():
         subprocess.run(['docker', 'start', contenedor_id])
         print("Contenedor Docker iniciado.")
     else:  # El contenedor no existe, ejecutar
-        subprocess.run(['docker', 'run', '--network=honeypot-network', 'honeypot1:v1', '--name', 'cowrie'])
+        subprocess.run(['docker', 'run', '-itd', '--network=honeypot-network', 'honeypot1:v1', '--name', 'cowrie'])
         print("Contenedor Docker ejecutado.")
 
 # Llamar a las funciones en orden
