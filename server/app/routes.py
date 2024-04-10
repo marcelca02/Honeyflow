@@ -58,16 +58,17 @@ def show_results():
     # En este ejemplo, estoy pasando un JSON simple como un diccionario de Python
     #os.path.join('JSON DIRECTORY', 'json file')
    
-   json_file_path = os.path.join ('app', 'test.json')
+   #json_file_path = os.path.join ('app', 'test.json')
 
    # Verificar si el archivo existe
-   if os.path.exists(json_file_path):
+   #if os.path.exists(json_file_path):
         # Leer el contenido del archivo JSON
-        with open(json_file_path, 'r') as json_file:
-            datos_json = json.load(json_file)
+        #with open(json_file_path, 'r') as json_file:
+        datos_json = json.loads(start_detection(1, 60))
+        print(datos_json)
         return render_template('show_results.html', datos=datos_json)
-   else:
+   #else:
         # Verifica si el archivo JSON existe
         # Devuelve un código de estado HTTP 404 y un mensaje personalizado
 
-        return render_template('error.html'), 404
+        #return render_template('error.html'), 404
