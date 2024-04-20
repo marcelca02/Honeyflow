@@ -51,24 +51,34 @@ def stop_docker():
     else:
         return render_template('resultado_honeypot.html', deploy=False, exito=False)
 
-
 @app.route('/show_results')
 def show_results():
-    # Aquí puedes definir el JSON que deseas pasar
-    # En este ejemplo, estoy pasando un JSON simple como un diccionario de Python
-    #os.path.join('JSON DIRECTORY', 'json file')
-   
-   #json_file_path = os.path.join ('app', 'test.json')
-
-   # Verificar si el archivo existe
-   #if os.path.exists(json_file_path):
-        # Leer el contenido del archivo JSON
-        #with open(json_file_path, 'r') as json_file:
-        datos_json = json.loads(start_detection(1, 60))
-        print(datos_json)
-        return render_template('show_results.html', datos=datos_json)
-   #else:
-        # Verifica si el archivo JSON existe
-        # Devuelve un código de estado HTTP 404 y un mensaje personalizado
-
-        #return render_template('error.html'), 404
+    # Ejecutar comando docker para copiar archivo JSON
+    processo = subprocess.run(['docker', 'cp', 'cowrie:/home/cowrie/cowrie/var/log/cowrie/cowrie.json', 'app/data_analysis/cowrie/cowrie.json'])
+    
+    if processo.returncode == 0:
+        json_file_path = os.path.join('app', 'data_analysis', 'cowrie', 'cowrie.json')
+        
+        # Verificar si el archivo existe
+        if os.path.exists(json_file_path):
+            try:
+                # Leer el contenido del archivo JSON
+                datos_json = []
+                with open(json_file_path, 'r') as json_file:
+                    for line in json_file:
+                        datos_json.append(json.loads(line))
+                    print(datos_json)
+                    return render_template('show_results.html', datos=datos_json)
+            except json.JSONDecodeError as error:
+                print(f"Error al leer archivo JSON: {error}")
+                return "Error al leer archivo JSON", 500
+        else:
+            print("Archivo JSON no encontrado")
+            return "Archivo JSON no encontrado", 404
+    else:
+        print("Error al ejecutar comando docker")
+        return "Error al ejecutar comando docker", 500
+        #Verifica si el archivo JSON existe
+        #Devuelve un código de estado HTTP 404 y un mensaje personalizado
+    #else:
+    #    return render_template('error.html'), 404

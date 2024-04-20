@@ -72,7 +72,7 @@ def main():
      pl = ["password","12345678", "admin", "password123", "password1234"]
      brute_force_attack("172.18.0.2", "22", ul, pl)
      port_scan("172.18.0.2")
-     execute_command("192.168.1.41", "22", "user", "password", "echo 'hola'")
+     #execute_command("192.168.1.41", "22", "user", "password", "echo 'hola'")
 
 if __name__ == "__main__":
     main()
