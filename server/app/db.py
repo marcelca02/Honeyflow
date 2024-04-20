@@ -22,8 +22,8 @@ class DBMethods:
         machine = Machine.query.get(id)
         return machine
 
-    def add_machine(self, name):
-        machine = Machine(name)
+    def add_machine(self, name, ip, interface):
+        machine = Machine(name=name, ip=ip, interface=interface)
         db.session.add(machine)
         db.session.commit()
         return machine
