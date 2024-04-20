@@ -1,17 +1,18 @@
 import pyshark as psh
-from app.config import INTERFACE, CONTAINER_IP 
 from flask import json
 
+ip = ''
 
-def start_detection(machine_id, timeout):
+def start_detection(interface,ip,timeout):
     # TODO: machine_id based detection
     print("Starting packet capture\n")
 
-    cap = psh.LiveCapture(interface=INTERFACE)
+    cap = psh.LiveCapture(interface=interface)
     cap.sniff(timeout=timeout)
     packets = [pkt for pkt in cap._packets]
     cap.close()
-
+    
+    ip = ip
     attempts = ssh_brute_force_detection(packets)
     open_ports = port_scaning_detection(packets)
     tcp_sources = dns_tunneling_detection(packets)
@@ -40,7 +41,7 @@ def ssh_brute_force_detection(packets):
             if hasattr(pkt, 'ssh'):
                 src_ip = pkt.ip.src
                 print(f"SSH packet from {src_ip}")
-                if src_ip != CONTAINER_IP:
+                if src_ip != ip:
                     if src_ip in attempts:
                         attempts[src_ip] += 1
                     else:
@@ -68,7 +69,7 @@ def port_scaning_detection(packets):
             if hasattr(pkt, 'tcp'):
                 src_ip = pkt.ip.src
                 dst_port = pkt.tcp.dstport
-                if src_ip != CONTAINER_IP:
+                if src_ip != ip:
                     print(f"TCP packet from {src_ip} to port {dst_port}")
                     if pkt.tcp.flags_syn == '1' and pkt.tcp.flags_ack == '0':
                         # SYN packet (potential start of TCP handshake)
