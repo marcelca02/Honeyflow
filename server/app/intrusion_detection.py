@@ -72,10 +72,10 @@ def port_scaning_detection(packets):
                     print(f"TCP packet from {src_ip} to port {dst_port}")
                     if pkt.tcp.flags_syn == '1' and pkt.tcp.flags_ack == '0':
                         # SYN packet (potential start of TCP handshake)
-                            if src_ip in open_ports:
-                                open_ports[src_ip].add(dst_port)
-                            else:
-                                open_ports[src_ip] = {dst_port}
+                        if src_ip in open_ports:
+                            open_ports[src_ip].add(dst_port)
+                        else:
+                            open_ports[src_ip] = {dst_port}
 
                     elif pkt.tcp.flags_rst == '1':
                         # RST packet (indicating closed port)
@@ -85,14 +85,15 @@ def port_scaning_detection(packets):
         except AttributeError:
             pass
 
-    for src_ip, ports in open_ports.items():
+    # Create a copy of the open_ports dictionary to avoid modifying it during iteration
+    open_ports_copy = dict(open_ports)
+    for src_ip, ports in open_ports_copy.items():
         if len(ports) < 20:  # Threshold for considering it as port scanning
             print(f"Port scanning detected from {src_ip} to ports {ports}")
             open_ports.pop(src_ip)
         open_ports[src_ip] = list(ports)
-
+    
     return open_ports
-
 
 def dns_tunneling_detection(packets):
     print("Starting DNS tunnel detection\n")
