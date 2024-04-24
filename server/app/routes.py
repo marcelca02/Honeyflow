@@ -78,7 +78,7 @@ def show_results():
                     eventid = d['eventid']
                     if eventid not in dataframes:
                         dataframes[eventid] = pd.DataFrame(columns=d.keys())
-                    dataframes[eventid] = dataframes[eventid].append(d, ignore_index=True)
+                    dataframes[eventid] = pd.concat([dataframes[eventid], pd.DataFrame([d])], ignore_index=True)                
                 # Render the template with the DataFrames
                 return render_template('show_results.html', dataframes=dataframes)
             except json.JSONDecodeError as error:
