@@ -6,7 +6,7 @@ from flask import render_template, request, jsonify, abort
 from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
-import plotly.graph_objs as go
+import pandas as pd
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running = False
@@ -62,13 +62,25 @@ def show_results():
         # Verificar si el archivo existe
         if os.path.exists(json_file_path):
             try:
-                # Leer el contenido del archivo JSON
-                datos_json = []
+                # Abre el archivo JSON y lee su contenido
                 with open(json_file_path, 'r') as json_file:
-                    for line in json_file:
-                        datos_json.append(json.loads(line))
-                    print(datos_json)
-                    return render_template('show_results.html', datos=datos_json)
+                      data_str = json_file.read()
+                # Divide la cadena en varias líneas
+                lines = data_str.splitlines()
+                # Combina las líneas en un solo objeto JSON
+                combined_data = '[' + ','.join(lines) + ']'
+
+                # Convierte el objeto JSON combinado en un arreglo de Python
+                data = json.loads(combined_data)
+                # Crea un diccionario de DataFrames en función del valor de la clave 'eventid'
+                dataframes = {}
+                for d in data:
+                    eventid = d['eventid']
+                    if eventid not in dataframes:
+                        dataframes[eventid] = pd.DataFrame(columns=d.keys())
+                    dataframes[eventid] = dataframes[eventid].append(d, ignore_index=True)
+                # Render the template with the DataFrames
+                return render_template('show_results.html', dataframes=dataframes)
             except json.JSONDecodeError as error:
                 print(f"Error al leer archivo JSON: {error}")
                 return "Error al leer archivo JSON", 500

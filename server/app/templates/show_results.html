@@ -5,13 +5,71 @@
   <div class="container-fluid py-5">
     <p class="col-md-8 fs-4">Datos del analisis</p>
     <form action="/show_results" method="get"></form>    
-    <ul>
-      {% for key, value in datos.items() %}
-        <li>{{  key }}: {{  value }}</li>
-      {% endfor %}
-    </ul>
-
+    {% if dataframes %}
+    {% for eventid, df in dataframes.items() %}
+      <h2 class="dataframe-title" data-target="dataframe-{{ eventid }}">
+        Evento {{ eventid }}
+      </h2>
+      <div id="dataframe-{{ eventid }}" class="dataframe-container">
+        <table class="table">
+          <thead>
+            <tr>{% for key in df.columns %}
+                <th>{{ key }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for index, row in df.iterrows() %}
+              <tr>
+                {% for value in row %}
+                  <td>{{ value }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No data available.</p>
+  {% endif %}
   </div>
 </div>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7RduPuemT//+jJXB16zg6i8UQD3lV5uDC3Yc7bz1Eeow" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() { 
+        // Esconde todas las tablas de DataFrame al cargar la página
+        const dataframeContainers = document.getElementsByClassName("dataframe-container");
+        for (let i = 0; i < dataframeContainers.length; i++) {
+          dataframeContainers[i].style.display = "none";
+        }
+        // Agrega un evento click a cada título de DataFrame  
+        const dataframeTitles = document.getElementsByClassName("dataframe-title");  
+        for (let i = 0; i < dataframeTitles.length; i++) {  
+          dataframeTitles[i].addEventListener("click", function() {  
+            const target = this.dataset.target;
+            const dataframeContainers = document.getElementsByClassName("dataframe-container");  
+            for (let j = 0; j < dataframeContainers.length; j++) {  
+              if (dataframeContainers[j].id === target) {  
+                // Muestra y oculta la tabla de DataFrame correspondiente  
+                dataframeContainers[j].style.display = dataframeContainers[j].style.display === "table" ? "none" : "table";  
+              }  
+            }  
+          });
+        }
+        // Cambia el cursor al pasar por encima de un título de DataFrame
+
+        for (let i = 0; i < dataframeTitles.length; i++) {
+          dataframeTitles[i].addEventListener("mouseover", function() {
+          this.style.cursor = "pointer";
+          });
+        }
+    });
+  </script>
 
 {% endblock %}
