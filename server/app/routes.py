@@ -15,6 +15,9 @@ docker_running = False
 def home():
     return render_template('index.html')
 
+@app.route('/configurar_honeypots')
+def configurar_honeypots():
+    return render_template('configurar_honeypots.html')
 
 @app.route('/deploy_honeypot')
 def deploy_honeypot():
