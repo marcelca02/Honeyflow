@@ -3,73 +3,71 @@
 {% block content %}
 <div class="p-5 mb-4 bg-body-tertiary rounded-3">
   <div class="container-fluid py-5">
-    <p class="col-md-8 fs-4">Datos del analisis</p>
-    <form action="/show_results" method="get"></form>    
+    <h2 class="display-5 fw-bold"> Datos del analisis</h2>
+    <p class="col-md-8 fs-4">Explicacion Datos</p>
     {% if dataframes %}
-    {% for eventid, df in dataframes.items() %}
-      <h2 class="dataframe-title" data-target="dataframe-{{ eventid }}">
-        Evento {{ eventid }}
-      </h2>
-      <div id="dataframe-{{ eventid }}" class="dataframe-container">
-        <table class="table">
-          <thead>
-            <tr>{% for key in df.columns %}
-                <th>{{ key }}</th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for index, row in df.iterrows() %}
-              <tr>
-                {% for value in row %}
-                  <td>{{ value }}</td>
-                {% endfor %}
-              </tr>
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            {% for eventid, df in dataframes.items() %}
+            {% if eventid == 'cowrie.session.connect' %}
+              {% set tab_title = 'Conexiones SSH/Telnet' %}
+            {% elif eventid == 'cowrie.client.version' %}
+              {% set tab_title = 'Version de entradas' %}
+            {% elif eventid == 'cowrie.client.kex' %}
+              {% set tab_title = 'SSH/Telnet Hash y IP origen' %}
+            {% elif eventid == 'cowrie.client.fingerprint' %}
+              {% set tab_title = 'FingerPrint de usuario' %}
+            {% elif eventid == 'cowrie.login.failed' %}
+              {% set tab_title = 'Intentos de Login' %}
+            {% else %}
+              {% set tab_title = 'Sesiones cerradas' %}
+            {% endif %}
+              <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark" id="event-{{ eventid }}-tab" data-bs-toggle="tab" data-bs-target="#event-{{ eventid }}" type="button" role="tab" aria-controls="event-{{ eventid }}" aria-selected="false">{{ tab_title }}</button>              </li>
             {% endfor %}
-          </tbody>
-        </table>
+          </ul>
+          <div class="tab-content mt-3" id="myTabContent">
+            {% for eventid, df in dataframes.items() %}
+              <div class="tab-pane fade" id="event-{{ eventid }}" role="tabpanel" aria-labelledby="event-{{ eventid }}-tab">
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        {% for key in df.columns %}
+                          <th>{{ key }}</th>
+                        {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for index, row in df.iterrows() %}
+                        <tr>
+                          {% for value in row %}
+                            <td>{{ value }}</td>
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
-    {% endfor %}
-  {% else %}
-    <p>No data available.</p>
-  {% endif %}
+    {% else %}
+      <p>No hay datos disponibles.</p>
+    {% endif %}
   </div>
 </div>
+  <sript src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7RduPuemT//+jJXB16zg6i8UQD3lV5uDC3Yc7bz1Eeow" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+  // Activar las pestañas de Bootstrap al cargar la página
+  document.addEventListener('DOMContentLoaded', function () {
+    var myTab = new bootstrap.Tab(document.getElementById('myTab'));
+    myTab.show();
+  });
+</script>
 
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7RduPuemT//+jJXB16zg6i8UQD3lV5uDC3Yc7bz1Eeow" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", function() { 
-        // Esconde todas las tablas de DataFrame al cargar la página
-        const dataframeContainers = document.getElementsByClassName("dataframe-container");
-        for (let i = 0; i < dataframeContainers.length; i++) {
-          dataframeContainers[i].style.display = "none";
-        }
-        // Agrega un evento click a cada título de DataFrame  
-        const dataframeTitles = document.getElementsByClassName("dataframe-title");  
-        for (let i = 0; i < dataframeTitles.length; i++) {  
-          dataframeTitles[i].addEventListener("click", function() {  
-            const target = this.dataset.target;
-            const dataframeContainers = document.getElementsByClassName("dataframe-container");  
-            for (let j = 0; j < dataframeContainers.length; j++) {  
-              if (dataframeContainers[j].id === target) {  
-                // Muestra y oculta la tabla de DataFrame correspondiente  
-                dataframeContainers[j].style.display = dataframeContainers[j].style.display === "table" ? "none" : "table";  
-              }  
-            }  
-          });
-        }
-        // Cambia el cursor al pasar por encima de un título de DataFrame
-
-        for (let i = 0; i < dataframeTitles.length; i++) {
-          dataframeTitles[i].addEventListener("mouseover", function() {
-          this.style.cursor = "pointer";
-          });
-        }
-    });
-  </script>
-
-{% endblock %}
+{% endblock %} 

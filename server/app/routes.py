@@ -82,7 +82,26 @@ def show_results():
                     if eventid not in dataframes:
                         dataframes[eventid] = pd.DataFrame(columns=d.keys())
                     dataframes[eventid] = pd.concat([dataframes[eventid], pd.DataFrame([d])], ignore_index=True)                
+                    if 'fingerprint'in d.keys():
+                        dataframes[eventid].drop('fingerprint', axis=1, inplace=True)
+                    if 'key'in d.keys():
+                        dataframes[eventid].drop('key', axis=1, inplace=True)
+                    if 'kexAlgs'in d.keys():
+                        dataframes[eventid].drop('kexAlgs', axis=1, inplace=True)
+                    if 'keyAlgs'in d.keys():
+                        dataframes[eventid].drop('keyAlgs', axis=1, inplace=True)
+                    if 'hasshAlgorithms'in d.keys():
+                        dataframes[eventid].drop('hasshAlgorithms', axis=1, inplace=True)
+                    if 'encCS'in d.keys():
+                        dataframes[eventid].drop('encCS', axis=1, inplace=True)
+                    if 'macCS'in d.keys():
+                        dataframes[eventid].drop('macCS', axis=1, inplace=True)
+                    if 'langCS'in d.keys():
+                         dataframes[eventid].drop('langCS', axis=1, inplace=True)
+                    if 'compCS'in d.keys():
+                         dataframes[eventid].drop('compCS', axis=1, inplace=True)
                 # Render the template with the DataFrames
+                print(dataframes)
                 return render_template('show_results.html', dataframes=dataframes)
             except json.JSONDecodeError as error:
                 print(f"Error al leer archivo JSON: {error}")
