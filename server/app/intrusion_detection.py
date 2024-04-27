@@ -1,5 +1,5 @@
 import pyshark as psh
-from config import INTERFACE, CONTAINER_IP 
+from app.config import INTERFACE, CONTAINER_IP 
 from flask import json
 from collections import defaultdict
 
@@ -222,5 +222,3 @@ def http_attack_detection(packets):
     suspicious_data["suspicious_ips"] = list(set(suspicious_data["suspicious_ips"]))
 
     return suspicious_data
-
-print (start_detection(1, 60))
