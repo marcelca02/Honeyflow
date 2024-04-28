@@ -1,4 +1,4 @@
-# scripts/attack_patterns.py
+# scripts/attack_cowrie.py
 
 import paramiko 
 import socket

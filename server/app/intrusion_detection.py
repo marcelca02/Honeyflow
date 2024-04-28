@@ -1,5 +1,6 @@
 import pyshark as psh
 from flask import json
+from collections import defaultdict
 
 ip = ''
 
@@ -16,6 +17,8 @@ def start_detection(interface,ip,timeout):
     attempts = ssh_brute_force_detection(packets)
     open_ports = port_scaning_detection(packets)
     tcp_sources = dns_tunneling_detection(packets)
+    suspicious_smtp = smtp_spam_detection(packets)  
+    suspicious_http = http_attack_detection(packets)  
     # TODO: Add more detection methods
 
     return json.dumps({
@@ -27,6 +30,14 @@ def start_detection(interface,ip,timeout):
         },
         'dns_tunneling': {
             'tcp_sources': list(tcp_sources.items())
+        },
+        'smtp_spam': {
+            'suspicious_ips': list(suspicious_smtp)
+        },
+        'http_attacks': {
+            'suspicious_ips': suspicious_http["suspicious_ips"],  
+            'injected_commands': dict(suspicious_http["injected_commands"]),  
+            'attempted_directories': dict(suspicious_http["attempted_directories"])  
         }
     })
 
@@ -73,10 +84,10 @@ def port_scaning_detection(packets):
                     print(f"TCP packet from {src_ip} to port {dst_port}")
                     if pkt.tcp.flags_syn == '1' and pkt.tcp.flags_ack == '0':
                         # SYN packet (potential start of TCP handshake)
-                            if src_ip in open_ports:
-                                open_ports[src_ip].add(dst_port)
-                            else:
-                                open_ports[src_ip] = {dst_port}
+                        if src_ip in open_ports:
+                            open_ports[src_ip].add(dst_port)
+                        else:
+                            open_ports[src_ip] = {dst_port}
 
                     elif pkt.tcp.flags_rst == '1':
                         # RST packet (indicating closed port)
@@ -86,14 +97,15 @@ def port_scaning_detection(packets):
         except AttributeError:
             pass
 
-    for src_ip, ports in open_ports.items():
+    # Create a copy of the open_ports dictionary to avoid modifying it during iteration
+    open_ports_copy = dict(open_ports)
+    for src_ip, ports in open_ports_copy.items():
         if len(ports) < 20:  # Threshold for considering it as port scanning
             print(f"Port scanning detected from {src_ip} to ports {ports}")
             open_ports.pop(src_ip)
         open_ports[src_ip] = list(ports)
-
+    
     return open_ports
-
 
 def dns_tunneling_detection(packets):
     print("Starting DNS tunnel detection\n")
@@ -148,3 +160,66 @@ def tcp_session_hijaking_detection(packets):
         except AttributeError:
             pass
     return suspicious_ips
+
+def smtp_spam_detection(packets):
+    print("Starting SMTP attack detection (spam)\n")
+    
+    spam_threshold=10
+    time_window=30
+
+    message_counts = defaultdict(int)  # Contador de mensajes por IP
+    first_message_times = {}  # Primer momento en que cada IP envía un mensaje
+    
+    suspicious_ips = [] 
+
+    for pkt in packets:
+        try:
+            if hasattr(pkt, 'smtp'):
+                src_ip = pkt.ip.src
+                if src_ip not in first_message_times:
+                    first_message_times[src_ip] = pkt.sniff_time.timestamp()
+
+                message_counts[src_ip] += 1
+
+                # Si el número de mensajes supera el umbral en el periodo de tiempo definido, es un posible spam
+                if message_counts[src_ip] > spam_threshold and (pkt.sniff_time.timestamp() - first_message_times[src_ip]) < time_window:
+                    suspicious_ips.append(src_ip)
+
+        except AttributeError:
+            pass
+    
+    # Remover duplicados y devolver solo las IPs sospechosas
+    return list(set(suspicious_ips))
+
+def http_attack_detection(packets):
+    print("Starting HTTP attack detection\n")
+    
+    # Diccionario para almacenar información sobre IPs sospechosas, comandos y directorios
+    suspicious_data = {
+        "suspicious_ips": [],
+        "injected_commands": defaultdict(list),
+        "attempted_directories": defaultdict(list)
+    }
+
+    for pkt in packets:
+        try:
+            if hasattr(pkt, 'http'):
+                src_ip = pkt.ip.src
+
+                # Verificar posibles intentos de inyección de comandos
+                if 'cmd=' in pkt.http.query or 'exec=' in pkt.http.query or 'bash' in pkt.http.file_name or 'bash' in pkt.http.file_name:
+                    suspicious_data["suspicious_ips"].append(src_ip)
+                    suspicious_data["injected_commands"][src_ip].append(pkt.http.query)
+
+                # Verificar intentos de descubrimiento de directorios
+                if 'dir=' in pkt.http.query or 'folder=' in pkt.http.query or '/' in pkt.http.request_uri:
+                    suspicious_data["suspicious_ips"].append(src_ip)
+                    suspicious_data["attempted_directories"][src_ip].append(pkt.http.request_uri)
+
+        except AttributeError:
+            pass
+
+    # Eliminar duplicados de las IPs sospechosas
+    suspicious_data["suspicious_ips"] = list(set(suspicious_data["suspicious_ips"]))
+
+    return suspicious_data

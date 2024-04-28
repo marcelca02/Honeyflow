@@ -6,7 +6,7 @@ from flask import render_template, request, jsonify, abort
 from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
-import plotly.graph_objs as go
+import pandas as pd
 from app.kubernetes import init_k8s, create_cowrie_pod, get_pods, delete_pod
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
@@ -15,6 +15,10 @@ docker_running = False
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/configurar_honeypots')
+def configurar_honeypots():
+    return render_template('configurar_honeypots.html')
 
 @app.route('/deploy_honeypot')
 def deploy_honeypot():
@@ -62,20 +66,44 @@ def k8s_cowrie():
 
 @app.route('/show_results')
 def show_results():
-    # Aquí puedes definir el JSON que deseas pasar
-    # En este ejemplo, estoy pasando un JSON simple como un diccionario de Python
-    #os.path.join('JSON DIRECTORY', 'json file')
-   
-   json_file_path = os.path.join ('app', 'test.json')
+    # Ejecutar comando docker para copiar archivo JSON
+    processo = subprocess.run(['docker', 'cp', 'cowrie:/home/cowrie/cowrie/var/log/cowrie/cowrie.json', 'app/data_analysis/cowrie/cowrie.json'])
+    
+    if processo.returncode == 0:
+        json_file_path = os.path.join('app', 'data_analysis', 'cowrie', 'cowrie.json')
+        
+        # Verificar si el archivo existe
+        if os.path.exists(json_file_path):
+            try:
+                # Abre el archivo JSON y lee su contenido
+                with open(json_file_path, 'r') as json_file:
+                      data_str = json_file.read()
+                # Divide la cadena en varias líneas
+                lines = data_str.splitlines()
+                # Combina las líneas en un solo objeto JSON
+                combined_data = '[' + ','.join(lines) + ']'
 
-   # Verificar si el archivo existe
-   if os.path.exists(json_file_path):
-        # Leer el contenido del archivo JSON
-        with open(json_file_path, 'r') as json_file:
-            datos_json = json.load(json_file)
-        return render_template('show_results.html', datos=datos_json)
-   else:
-        # Verifica si el archivo JSON existe
-        # Devuelve un código de estado HTTP 404 y un mensaje personalizado
-
-        return render_template('error.html'), 404
+                # Convierte el objeto JSON combinado en un arreglo de Python
+                data = json.loads(combined_data)
+                # Crea un diccionario de DataFrames en función del valor de la clave 'eventid'
+                dataframes = {}
+                for d in data:
+                    eventid = d['eventid']
+                    if eventid not in dataframes:
+                        dataframes[eventid] = pd.DataFrame(columns=d.keys())
+                    dataframes[eventid] = pd.concat([dataframes[eventid], pd.DataFrame([d])], ignore_index=True)                
+                # Render the template with the DataFrames
+                return render_template('show_results.html', dataframes=dataframes)
+            except json.JSONDecodeError as error:
+                print(f"Error al leer archivo JSON: {error}")
+                return "Error al leer archivo JSON", 500
+        else:
+            print("Archivo JSON no encontrado")
+            return "Archivo JSON no encontrado", 404
+    else:
+        print("Error al ejecutar comando docker")
+        return "Error al ejecutar comando docker", 500
+        #Verifica si el archivo JSON existe
+        #Devuelve un código de estado HTTP 404 y un mensaje personalizado
+    #else:
+    #    return render_template('error.html'), 404
