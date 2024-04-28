@@ -1,27 +1,55 @@
 from kubernetes import client, config
+from app.config import COWRIE_IMAGE
 
 def init_k8s():
     config.load_kube_config()
     v1 = client.CoreV1Api()
     return v1
 
-def new_pod(name, image, v1, ports, namespace='default'):
-    pod_manifest = {
-        "apiVersion": "v1",
-        "kind": "Pod",
-        "metadata": {
-            "name": name
+
+def create_cowrie_pod(v1, namespace='default'):
+    pod = {
+        'apiVersion': 'v1',
+        'kind': 'Pod',
+        'metadata': {
+            'name': 'cowrie',
         },
-        "spec": {
-            "containers": [{
-                "name": name,
-                "image": image,
-                "ports": [{"containerPort": ports}]
-            }]
+        'spec': {
+            'containers': [
+                {
+                    'name': 'cowrie',
+                    'image': COWRIE_IMAGE,
+                }
+            ]
         }
     }
-    resp = v1.create_namespaced_pod(namespace, body=pod_manifest)
-    return resp
+    v1.create_namespaced_pod(namespace, pod)
+
+    service = {
+        'apiVersion': 'v1',
+        'kind': 'Service',
+        'metadata': {
+            'name': 'cowrie',
+        },
+        'spec': {
+            'ports': [
+                {
+                    'protocol': 'TCP',
+                    'port': 22,
+                    'targetPort': 40550,
+                },
+                {
+                    'protocol': 'TCP',
+                    'port': 23,
+                    'targetPort': 40551,
+                }
+            ]
+        }
+    }
+
+    v1.create_namespaced_service(namespace, service)
+
+
 
 def get_pods(v1, namespace='default'):
     return v1.list_namespaced_pod(namespace)

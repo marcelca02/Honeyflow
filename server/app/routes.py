@@ -7,6 +7,7 @@ from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
 import plotly.graph_objs as go
+from app.kubernetes import init_k8s, create_cowrie_pod, get_pods, delete_pod
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running = False
@@ -14,7 +15,6 @@ docker_running = False
 @app.route('/')
 def home():
     return render_template('index.html')
-
 
 @app.route('/deploy_honeypot')
 def deploy_honeypot():
@@ -50,6 +50,14 @@ def stop_docker():
         return render_template('resultado_honeypot.html', deploy=False, exito=True)
     else:
         return render_template('resultado_honeypot.html', deploy=False, exito=False)
+
+@app.route('/k8s_cowrie')
+def k8s_cowrie():
+    v1 = init_k8s()
+    create_cowrie_pod(v1)
+    pods = get_pods(v1)
+    return "Pods: " + str(pods)
+    
 
 
 @app.route('/show_results')
