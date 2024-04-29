@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:22.04
 
 # Instalar Python 3 y pip
 RUN apt update && apt install -y python3 python3-pip git
