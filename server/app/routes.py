@@ -54,8 +54,20 @@ def stop_docker():
     else:
         return render_template('resultado_honeypot.html', deploy=False, exito=False)
 
-@app.route('/show_results')
-def show_results():
+@app.route('/honeypots_analysis')
+def honeypots_analysis():
+    # Lista de honeypots disponibles con sus nombres y rutas HTML asociadas
+    honeypots = [
+        {'name': 'Cowrie', 'html_route': 'show_results_cowrie'},
+        {'name': 'Heralding', 'html_route': 'show_results_heralding'},
+        {'name': 'Mailoney', 'html_route': 'show_results_mailoney'}
+        # Agrega más honeypots según sea necesario con sus nombres y rutas HTML correspondientes
+    ]
+
+    return render_template('honeypots_analysis.html', honeypots=honeypots)
+
+@app.route('/show_results_cowrie')
+def show_results_cowrie():
     # Ejecutar comando docker para copiar archivo JSON
     processo = subprocess.run(['docker', 'cp', 'cowrie:/home/cowrie/cowrie/var/log/cowrie/cowrie.json', 'app/data_analysis/cowrie/cowrie.json'])
     
@@ -101,8 +113,7 @@ def show_results():
                     if 'compCS'in d.keys():
                          dataframes[eventid].drop('compCS', axis=1, inplace=True)
                 # Render the template with the DataFrames
-                print(dataframes)
-                return render_template('show_results.html', dataframes=dataframes)
+                return render_template('show_results_cowrie.html', dataframes=dataframes)
             except json.JSONDecodeError as error:
                 print(f"Error al leer archivo JSON: {error}")
                 return "Error al leer archivo JSON", 500
@@ -116,3 +127,15 @@ def show_results():
         #Devuelve un código de estado HTTP 404 y un mensaje personalizado
     #else:
     #    return render_template('error.html'), 404
+
+@app.route('/show_results_heralding')
+def show_results_heralding():
+    return render_template('graficos_cowrie.html')
+
+@app.route('/show_results_mailoney')
+def show_results_mailoney():
+    return render_template('graficos_cowrie.html')
+
+@app.route('/graficos_cowrie')
+def graficos_cowrie():
+    return render_template('graficos_cowrie.html')
