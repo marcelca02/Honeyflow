@@ -130,7 +130,50 @@ def show_results_cowrie():
 
 @app.route('/show_results_heralding')
 def show_results_heralding():
-    return render_template('graficos_cowrie.html')
+    processo = subprocess.run(['docker', 'cp', 'heralding:/log_session.json', 'app/data_analysis/heralding/heralding.json'])
+    if processo.returncode == 0:
+        json_file_path = os.path.join('app', 'data_analysis', 'heralding', 'heralding.json')
+        
+        # Verificar si el archivo existe
+        if os.path.exists(json_file_path):
+            try:
+                # Abre el archivo JSON y lee su contenido
+                with open(json_file_path, 'r') as json_file:
+                      data_str = json_file.read()
+                # Divide la cadena en varias líneas
+                lines = data_str.splitlines()
+                # Combina las líneas en un solo objeto JSON
+                combined_data = '[' + ','.join(lines) + ']'
+
+                # Convierte el objeto JSON combinado en un arreglo de Python
+                data = json.loads(combined_data)
+
+                dataframe = pd.DataFrame(data)
+                # Filtrar los datos para crear un DataFrame específico para auth_attempts
+                # Crear un DataFrame para almacenar los datos de auth_attempts
+                auth_attempts_df = pd.DataFrame(columns=['timestamp', 'username', 'password'])
+
+                # Crear un nuevo DataFrame para auth_attempts_df
+                if 'auth_attempts' in dataframe.columns:
+                    auth_attempts_list = dataframe['auth_attempts'].tolist()
+                    auth_attempts_df_list = []
+                    for auth_attempt in auth_attempts_list:
+                        auth_attempts_df = pd.DataFrame(auth_attempt)
+                        auth_attempts_df.columns = ['timestamp', 'username', 'password']
+                        auth_attempts_df_list.append(auth_attempts_df)
+                    auth_attempts_df = pd.concat(auth_attempts_df_list)
+                    dataframe.drop('auth_attempts', axis=1, inplace=True)
+                return render_template('show_results_heralding.html', dataframe=dataframe, auth_attempts_df=auth_attempts_df)
+            except json.JSONDecodeError as error:
+                        print(f"Error al leer archivo JSON: {error}")
+                        return "Error al leer archivo JSON", 500
+        else:
+            print("Archivo JSON no encontrado")
+            return "Archivo JSON no encontrado", 404
+    else:
+        print("Error al ejecutar comando docker")
+        return "Error al ejecutar comando docker", 500
+
 
 @app.route('/show_results_mailoney')
 def show_results_mailoney():
