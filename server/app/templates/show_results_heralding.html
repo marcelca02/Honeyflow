@@ -6,7 +6,7 @@
     <h2 class="display-5 fw-bold">Datos del análisis</h2>   
     <p class="col-md-8 fs-4">Explicación de los datos</p>
     <div class="d-flex justify-content-end mb-3">
-      <a href="{{ url_for('graficos_cowrie') }}" class="btn btn-primary">Gráficos</a>
+      <a href="{{ url_for('graficos_heralding') }}" class="btn btn-primary">Gráficos</a>
     </div> 
     {% if dataframe is not none %}
       <div class="row">
@@ -14,11 +14,11 @@
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             {% if auth_attempts_df is not none %}
             <li class="nav-item" role="presentation">
-              <button class="nav-link text-dark" id="auth-attempts-tab" data-bs-toggle="tab" data-bs-target="#auth-attempts" type="button" role="tab" aria-controls="auth-attempts" aria-selected="false">Tabla de auth_attempts</button>
+              <button class="nav-link text-dark" id="auth-attempts-tab" data-bs-toggle="tab" data-bs-target="#auth-attempts" type="button" role="tab" aria-controls="auth-attempts" aria-selected="false">Auth Credencials</button>
             </li>
             {% endif %}
             <li class="nav-item" role="presentation">
-              <button class="nav-link text-dark active" id="dataframe-tab" data-bs-toggle="tab" data-bs-target="#dataframe" type="button" role="tab" aria-controls="dataframe" aria-selected="true">Tabla de datos principal</button>
+              <button class="nav-link text-dark active" id="dataframe-tab" data-bs-toggle="tab" data-bs-target="#dataframe" type="button" role="tab" aria-controls="dataframe" aria-selected="true">Other Data</button>
             </li>
           </ul>
           <div class="tab-content mt-3" id="myTabContent">

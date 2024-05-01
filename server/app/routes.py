@@ -182,3 +182,11 @@ def show_results_mailoney():
 @app.route('/graficos_cowrie')
 def graficos_cowrie():
     return render_template('graficos_cowrie.html')
+
+@app.route('/graficos_heralding')
+def graficos_heralding():
+    return render_template('graficos_heralding.html')
+
+@app.route('/graficos_mailoney')
+def graficos_mailoney():
+    return render_template('graficos_mailoney.html')
