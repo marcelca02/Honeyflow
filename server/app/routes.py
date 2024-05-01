@@ -19,6 +19,11 @@ def home():
 def configurar_honeypots():
     return render_template('configurar_honeypots.html')
 
+@app.route('/about_project')
+def about_project():
+    return render_template('about_project.html')
+
+
 @app.route('/deploy_honeypot')
 def deploy_honeypot():
     return render_template('deploy_honeypot.html')
