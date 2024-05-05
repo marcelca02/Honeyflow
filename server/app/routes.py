@@ -7,6 +7,7 @@ from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
 import pandas as pd
+import re
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running = False
@@ -177,7 +178,73 @@ def show_results_heralding():
 
 @app.route('/show_results_mailoney')
 def show_results_mailoney():
-    return render_template('graficos_cowrie.html')
+    #processo = subprocess.run(['docker', 'cp', 'mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
+    #if processo.returncode == 0:
+        log_file_path = os.path.join('app', 'data_analysis', 'mailoney', 'mailoney.log')
+        
+        if os.path.exists(log_file_path):
+            try:
+                pattern = r'\[(.*?)\]\[(.*?)\] (.*)'
+                regex = re.compile(pattern)
+                
+                data = {}
+                
+                with open(log_file_path, 'r') as log_file:
+                    for line in log_file:
+                        match = regex.match(line)
+                        if match:
+                            timestamp = match.group(1)
+                            ip_port = match.group(2)
+                            action = match.group(3)
+                            
+                            # Inicializar las acciones como diccionarios vacíos si no existen
+                            if ip_port not in data:
+                                data[ip_port] = {
+                                    'IP:Puerto': ip_port,
+                                    'HELO': None,
+                                    'MAIL FROM': None,
+                                    'RCPT TO': None,
+                                    'DATA': None
+                                }
+                            
+                            # Extraer HELO, MAIL FROM, RCPT TO y DATA si están presentes
+                            helo_match = re.search(r'HELO (.*)', action)
+                            mail_from_match = re.search(r'MAIL FROM: <(.*?)>', action)
+                            rcpt_to_match = re.search(r'RCPT TO: <(.*?)>', action)
+                            data_match = re.search(r'DATA \+ (.*)', action)
+                            
+                            if helo_match:
+                                data[ip_port]['HELO'] = helo_match.group(1)
+                            elif mail_from_match:
+                                data[ip_port]['MAIL FROM'] = mail_from_match.group(1)
+                            elif rcpt_to_match:
+                                data[ip_port]['RCPT TO'] = rcpt_to_match.group(1)
+                            elif data_match:
+                                data[ip_port]['DATA'] = data_match.group(1)
+                
+                # Convertir el diccionario en una lista de diccionarios
+                data_list = list(data.values())
+                
+                # Crear DataFrame a partir de la lista de diccionarios
+                df = pd.DataFrame(data_list)
+                    
+                print(df)
+                print(data)
+                
+                # Renderizar la plantilla HTML y pasar el DataFrame como contexto
+                return render_template('show_results_mailoney.html', dataframe=df)
+
+            except Exception as e:
+                print(f"Error al leer el archivo de registro: {e}")
+                return "Error al leer el archivo de registro", 500
+
+        else:
+            print("Archivo de registro no encontrado")
+            return "Archivo de registro no encontrado", 404
+   # else:
+   #     print("Error al ejecutar comando docker")
+   #     return "Error al ejecutar comando docker", 500
+
 
 @app.route('/graficos_cowrie')
 def graficos_cowrie():
