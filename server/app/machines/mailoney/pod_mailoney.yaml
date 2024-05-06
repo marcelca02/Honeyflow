@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mailoney
+spec:
+  containers:
+  - name: mailoney
+    image: rduran02/honeyflow-mailoney:latest
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 25
