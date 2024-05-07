@@ -63,6 +63,7 @@ def stop_docker():
 @app.route('/k8s_cowrie')
 def k8s_cowrie():
     create_mailoney_pod()
+    return "Hello"
     
 
 
