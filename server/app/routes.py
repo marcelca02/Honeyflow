@@ -7,7 +7,7 @@ from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
 import pandas as pd
-from app.kubernetes import init_k8s, create_cowrie_pod, get_pods, delete_pod
+from app.kubernetes import create_mailoney_pod
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running = False
@@ -62,10 +62,7 @@ def stop_docker():
 
 @app.route('/k8s_cowrie')
 def k8s_cowrie():
-    v1 = init_k8s()
-    create_cowrie_pod(v1)
-    pods = get_pods(v1)
-    return "Pods: " + str(pods)
+    create_mailoney_pod()
     
 
 
