@@ -10,56 +10,19 @@ def init_k8s():
 
 def create_cowrie_pod(v1, namespace='default'):
     # # Comand line version
-    service_name = 'cowrie'
+    service_name = 'cowrie-service'
     port = '8081'
 
-
-    subprocess.run(['kubectl', 'run', 'cowrie', '--image', COWRIE_IMAGE, '--port', '22'])  
+    subprocess.run(['kubectl', 'apply', '-f', 'machines/cowrie/cowrie.yaml'])
     subprocess.run(['kubectl', 'expose', 'pod', 'cowrie', 'type=NodePort', '--port=' + port, '--targetPort=22', '--name=' + service_name])
 
+def create_mailoney_pod():
+    # # Comand line version
+    service_name = 'mailoney-service'
+    port = '8082'
 
-    # # kubernetes client library version
-    # pod = {
-    #     'apiVersion': 'v1',
-    #     'kind': 'Pod',
-    #     'metadata': {
-    #         'name': 'cowrie',
-    #     },
-    #     'spec': {
-    #         'containers': [
-    #             {
-    #                 'name': 'cowrie',
-    #                 'image': COWRIE_IMAGE,
-    #             }
-    #         ]
-    #     }
-    # }
-    # v1.create_namespaced_pod(namespace, pod)
-    #
-    # service = {
-    #     'apiVersion': 'v1',
-    #     'kind': 'Service',
-    #     'metadata': {
-    #         'name': 'cowrie',
-    #     },
-    #     'spec': {
-    #         'ports': [
-    #             {
-    #                 'protocol': 'TCP',
-    #                 'port': 22,
-    #                 'targetPort': 40550,
-    #             },
-    #             {
-    #                 'protocol': 'TCP',
-    #                 'port': 23,
-    #                 'targetPort': 40551,
-    #             }
-    #         ]
-    #     }
-    # }
-    #
-    # v1.create_namespaced_service(namespace, service)
-
+    subprocess.run(['kubectl', 'apply', '-f', 'machines/mailoney/mailoney.yaml'])
+    subprocess.run(['kubectl', 'expose', 'pod', 'mailoney', 'type=NodePort', '--port=' + port, '--targetPort=25', '--name=' + service_name])
 
 
 def get_pods(v1, namespace='default'):
