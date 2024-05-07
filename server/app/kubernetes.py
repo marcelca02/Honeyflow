@@ -1,4 +1,5 @@
 from kubernetes import client, config
+import subprocess
 from app.config import COWRIE_IMAGE
 
 def init_k8s():
@@ -8,46 +9,56 @@ def init_k8s():
 
 
 def create_cowrie_pod(v1, namespace='default'):
-    pod = {
-        'apiVersion': 'v1',
-        'kind': 'Pod',
-        'metadata': {
-            'name': 'cowrie',
-        },
-        'spec': {
-            'containers': [
-                {
-                    'name': 'cowrie',
-                    'image': COWRIE_IMAGE,
-                }
-            ]
-        }
-    }
-    v1.create_namespaced_pod(namespace, pod)
+    # # Comand line version
+    service_name = 'cowrie'
+    port = '8081'
 
-    service = {
-        'apiVersion': 'v1',
-        'kind': 'Service',
-        'metadata': {
-            'name': 'cowrie',
-        },
-        'spec': {
-            'ports': [
-                {
-                    'protocol': 'TCP',
-                    'port': 22,
-                    'targetPort': 40550,
-                },
-                {
-                    'protocol': 'TCP',
-                    'port': 23,
-                    'targetPort': 40551,
-                }
-            ]
-        }
-    }
 
-    v1.create_namespaced_service(namespace, service)
+    subprocess.run(['kubectl', 'run', 'cowrie', '--image', COWRIE_IMAGE, '--port', '22'])  
+    subprocess.run(['kubectl', 'expose', 'pod', 'cowrie', 'type=NodePort', '--port=' + port, '--targetPort=22', '--name=' + service_name])
+
+
+    # # kubernetes client library version
+    # pod = {
+    #     'apiVersion': 'v1',
+    #     'kind': 'Pod',
+    #     'metadata': {
+    #         'name': 'cowrie',
+    #     },
+    #     'spec': {
+    #         'containers': [
+    #             {
+    #                 'name': 'cowrie',
+    #                 'image': COWRIE_IMAGE,
+    #             }
+    #         ]
+    #     }
+    # }
+    # v1.create_namespaced_pod(namespace, pod)
+    #
+    # service = {
+    #     'apiVersion': 'v1',
+    #     'kind': 'Service',
+    #     'metadata': {
+    #         'name': 'cowrie',
+    #     },
+    #     'spec': {
+    #         'ports': [
+    #             {
+    #                 'protocol': 'TCP',
+    #                 'port': 22,
+    #                 'targetPort': 40550,
+    #             },
+    #             {
+    #                 'protocol': 'TCP',
+    #                 'port': 23,
+    #                 'targetPort': 40551,
+    #             }
+    #         ]
+    #     }
+    # }
+    #
+    # v1.create_namespaced_service(namespace, service)
 
 
 

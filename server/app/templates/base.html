@@ -26,10 +26,12 @@
 <main>
   <div class="container py-4">
     <header class="pb-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
-        <img src="{{ url_for('static', filename='img/hf.png') }}" class="float-start me-2" alt="LOGO" style="height:50px;">
-        <span class="display-5">HoneyFlow</span>
-      </a>
+	  <div class="d-flex align-items-center">
+        <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
+          <img src="{{ url_for('static', filename='img/hf.png') }}" class="float-start me-2" alt="LOGO" style="height:50px;">
+          <span class="display-5">HoneyFlow</span>
+      	</a>
+	  </div>
     </header>
 
     {% block content %}
