@@ -1,9 +1,9 @@
 import docker
 
-def crear_cowrie():
+def crear_heralding():
 	client = docker.from_env()
 	# mirar si existe el contenedor
-	container = client.containers.list(all=True, filters={'name': 'cowrie'})
+	container = client.containers.list(all=True, filters={'name': 'heralding'})
 	# si existe:
 	if container:
 		# Si el contenedor ya existe, intenta iniciarlo
@@ -20,17 +20,17 @@ def crear_cowrie():
 		print("Creando network...")
 		client.networks.create('honeypot-network', driver='bridge')
 
-	images = client.images.list(name='cowrie')
+	images = client.images.list(name='heralding')
 	if not images:
 		# Construye la imagen si no existe
 		print("Creando imagen...")
-		client.images.build(path='machines/cowrie/.', tag='cowrie', rm=True)
+		client.images.build(path='machines/heralding/.', tag='heralding', rm=True)
 	
 	# Ejecuta el contenedor con el nombre especificado
 	print("Run container...")
-	client.containers.run('cowrie', stdin_open=True, tty=True, detach=True, network='honeypot-network', name='cowrie')
+	client.containers.run('heralding', stdin_open=True, tty=True, detach=True, network='honeypot-network', name='heralding')
 
 
-crear_cowrie()
+crear_heralding()
 
 

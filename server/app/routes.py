@@ -1,5 +1,5 @@
 import subprocess
-#import docker
+import docker
 import json
 import os
 from flask import render_template, request, jsonify, abort
@@ -9,7 +9,9 @@ from app.db import DBMethods
 import pandas as pd
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
-docker_running = False
+docker_running_c = False
+docker_running_h = False
+docker_running_m = False
 
 @app.route('/')
 def home():
@@ -24,40 +26,64 @@ def about_project():
     return render_template('about_project.html')
 
 
-@app.route('/deploy_honeypot')
-def deploy_honeypot():
-    return render_template('deploy_honeypot.html')
+#@app.route('/deploy_honeypot')
+#def deploy_honeypot():
+#    return render_template('deploy_honeypot.html')
 
 
 @app.route('/ejecutar_docker', methods=['POST'])
 def ejecutar_docker():
-    global docker_running # indicamos que se usa la variable global
-    proceso = subprocess.run(['python3', 'app/run_docker_cowrie.py'])
-    if proceso.returncode == 0:
-        docker_running = True
-        return render_template('resultado_honeypot.html', deploy=True, exito=True)
+    # indicamos que se usa la variable global
+    global docker_running_c
+    global docker_running_h 
+    global docker_running_m
+
+    h_name = request.form['h_name']
+    proceso = subprocess.run(['python3', f'app/run_docker_{h_name}.py'])
+    client = docker.from_env()
+    contenedor = client.containers.get(f'{h_name}')
+
+    if contenedor.status == 'running':
+        if h_name == 'cowrie':
+            docker_running_c = True
+        elif h_name == 'heralding':
+            docker_running_h = True
+        elif h_name == 'mailoney':
+            docker_running_m = True
+        return render_template('resultado_honeypot.html', exito=True)
     else:
-        docker_running = False # no haria falta si ya es False por defecto
-        return render_template('resultado_honeypot.html', deploy=True, exito=False)
+        docker_running_h = False # no haria falta si ya es False por defecto
+        docker_running_c = False 
+        docker_running_m = False 
+        return render_template('resultado_honeypot.html', exito=False)
 
 
-@app.route('/stop_honeypot')
-def stop_honeypot():
-    return render_template('stop_honeypot.html', docker_running=docker_running)
+#@app.route('/stop_honeypot')
+#def stop_honeypot():
+#    return render_template('stop_honeypot.html', docker_running=docker_running)
 
 
 @app.route('/stop_docker', methods=['POST'])
 def stop_docker():
-    global docker_running
-    # de momento solo habra un resultado solo uno corriendo
-    proceso = subprocess.run(['docker', 'ps', '-a', '--filter', 'ancestor=honeypot1:v1','--format', '{{.ID}}'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    container_id = proceso.stdout.decode().strip()
-    proceso2 = subprocess.run(['docker', 'stop', container_id])
-    if proceso2.returncode == 0:
-        docker_running = False
-        return render_template('resultado_honeypot.html', deploy=False, exito=True)
-    else:
-        return render_template('resultado_honeypot.html', deploy=False, exito=False)
+    global docker_running_c
+    global docker_running_h
+    global docker_running_m
+
+    h_name = request.form['h_name']
+
+    if h_name == 'cowrie' and docker_running_c == False:
+        return render_template('stop_honeypot.html', running_honeypot=False) 
+    if h_name == 'heralding' and docker_running_h == False:
+        return render_template('stop_honeypot.html', running_honeypot=False) 
+    if h_name == 'mailoney' and docker_running_m == False:
+        return render_template('stop_honeypot.html', running_honeypot=False) 
+
+    client = docker.from_env()
+    contenedor = client.containers.get(f'{h_name}')
+    contenedor.stop()
+
+    return render_template('stop_honeypot.html', running_honeypot=True)
+
 
 @app.route('/honeypots_analysis')
 def honeypots_analysis():
@@ -135,7 +161,50 @@ def show_results_cowrie():
 
 @app.route('/show_results_heralding')
 def show_results_heralding():
-    return render_template('graficos_cowrie.html')
+    processo = subprocess.run(['docker', 'cp', 'heralding:/log_session.json', 'app/data_analysis/heralding/heralding.json'])
+    if processo.returncode == 0:
+        json_file_path = os.path.join('app', 'data_analysis', 'heralding', 'heralding.json')
+        
+        # Verificar si el archivo existe
+        if os.path.exists(json_file_path):
+            try:
+                # Abre el archivo JSON y lee su contenido
+                with open(json_file_path, 'r') as json_file:
+                      data_str = json_file.read()
+                # Divide la cadena en varias líneas
+                lines = data_str.splitlines()
+                # Combina las líneas en un solo objeto JSON
+                combined_data = '[' + ','.join(lines) + ']'
+
+                # Convierte el objeto JSON combinado en un arreglo de Python
+                data = json.loads(combined_data)
+
+                dataframe = pd.DataFrame(data)
+                # Filtrar los datos para crear un DataFrame específico para auth_attempts
+                # Crear un DataFrame para almacenar los datos de auth_attempts
+                auth_attempts_df = pd.DataFrame(columns=['timestamp', 'username', 'password'])
+
+                # Crear un nuevo DataFrame para auth_attempts_df
+                if 'auth_attempts' in dataframe.columns:
+                    auth_attempts_list = dataframe['auth_attempts'].tolist()
+                    auth_attempts_df_list = []
+                    for auth_attempt in auth_attempts_list:
+                        auth_attempts_df = pd.DataFrame(auth_attempt)
+                        auth_attempts_df.columns = ['timestamp', 'username', 'password']
+                        auth_attempts_df_list.append(auth_attempts_df)
+                    auth_attempts_df = pd.concat(auth_attempts_df_list)
+                    dataframe.drop('auth_attempts', axis=1, inplace=True)
+                return render_template('show_results_heralding.html', dataframe=dataframe, auth_attempts_df=auth_attempts_df)
+            except json.JSONDecodeError as error:
+                        print(f"Error al leer archivo JSON: {error}")
+                        return "Error al leer archivo JSON", 500
+        else:
+            print("Archivo JSON no encontrado")
+            return "Archivo JSON no encontrado", 404
+    else:
+        print("Error al ejecutar comando docker")
+        return "Error al ejecutar comando docker", 500
+
 
 @app.route('/show_results_mailoney')
 def show_results_mailoney():
@@ -144,3 +213,11 @@ def show_results_mailoney():
 @app.route('/graficos_cowrie')
 def graficos_cowrie():
     return render_template('graficos_cowrie.html')
+
+@app.route('/graficos_heralding')
+def graficos_heralding():
+    return render_template('graficos_heralding.html')
+
+@app.route('/graficos_mailoney')
+def graficos_mailoney():
+    return render_template('graficos_mailoney.html')

@@ -3,7 +3,6 @@
 
     <div class="p-5 mb-4 bg-body-tertiary rounded-3">
       <div class="container-fluid py-5">
-        {% if deploy %}
           {% if exito %}
             <div class="alert alert-success" role="alert">
                 ¡Docker iniciado con éxito!
@@ -13,17 +12,10 @@
                 ¡Algo salió mal en la ejecución del docker!
             </div>
           {% endif %}
-        {% else %}
-          {% if exito %}
-            <div class="alert alert-success" role="alert">
-                ¡Docker parado con éxito!
-            </div>
-          {% else %}
-            <div class="alert alert-danger" role="alert">
-                ¡Algo salió mal al parar el docker!
-            </div>
-          {% endif %}
-        {% endif %}
+
+        <!-- boton de volver -->
+        <a href="{{ url_for('configurar_honeypots') }}" class="btn btn-outline-secondary float-end mt-4" type="button">Volver</a>
+
       </div>
     </div>
 

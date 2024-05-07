@@ -13,21 +13,48 @@
 			<div class="h-100 p-5 text-bg-dark rounded-3">
 				<h2>Cowrie</h2>
 				<p>Cowrie es un honeypot de alta interacción diseñado para imitar un sistema Linux vulnerable. Funciona como una trampa para atraer y registrar actividades maliciosas de hackers y bots en la red. Al simular servicios como SSH, Telnet y FTP (nos hemos enfocado principalmente en el servicio de SSH). Cowrie registra los intentos de acceso, los comandos ejecutados y otros comportamientos sospechosos de los atacantes.</p>
-				<button class="btn btn-outline-light" type="button">Deploy</button>
+				<div class="d-inline-block">
+				<form action="/ejecutar_docker" method="post">
+					<input type="hidden" name="h_name" value="cowrie">
+					<button class="btn btn-outline-light ms-5" type="submit">Deploy</button>
+				</form></div>
+				<div class="d-inline-block">
+				<form action="/stop_docker" method="post">
+					<input type="hidden" name="h_name" value="cowrie">
+					<button class="btn btn-outline-light ms-5" type="submit">Stop</button>
+				</form></div>
 			</div>			
 		</div>
 		<div class="col-md-4">
 			<div class="h-100 p-5 bg-body-tertiary border rounded-3">
 				<h2>Mailoney</h2>
 				<p>Mailoney es un honeypot diseñado para simular un servidor de correo electrónico vulnerable. Funciona interceptando y registrando intentos de conexión a los puertos SMTP, IMAP y POP3, así como intentos de autenticación en el servidor de correo simulado. Mailoney registra las credenciales utilizadas en los intentos de inicio de sesión y otros datos relacionados con los intentos de ataque, proporcionando información valiosa sobre posibles amenazas y tácticas utilizadas por los atacantes.</p>
-				<button class="btn btn-outline-secondary" type="button">Deploy</button>
+				<div class="d-inline-block">
+				<form action="/ejecutar_docker" method="post">
+					<input type="hidden" name="h_name" value="mailoney">
+					<button class="btn btn-outline-secondary ms-5" type="submit">Deploy</button>
+				</form></div>
+				<div class="d-inline-block">
+				<form action="/stop_docker" method="post">
+					<input type="hidden" name="h_name" value="mailoney">
+					<button class="btn btn-outline-secondary ms-5" type="submit">Stop</button>
+				</form></div>
 			</div>		
 		</div>
 		<div class="col-md-4">
 			<div class="h-100 p-5 text-bg-dark rounded-3">
 				<h2>Heralding</h2>
 				<p>Heralding es un honeypot de alta interacción que simula varios servicios de red para atraer a posibles atacantes y registrar sus actividades maliciosas. Funciona emulando servicios como HTTP, FTP, SSH, Telnet y más, para detectar y registrar intentos de explotación y acceso no autorizado.</p>
-				<button class="btn btn-outline-light" type="button">Deploy</button>
+				<div class="d-inline-block">
+				<form action="/ejecutar_docker" method="post">
+					<input type="hidden" name="h_name" value="heralding">
+					<button class="btn btn-outline-light ms-5" type="submit">Deploy</button>
+				</form></div>
+				<div class="d-inline-block">
+				<form action="/stop_docker" method="post">
+					<input type="hidden" name="h_name" value="heralding">
+					<button class="btn btn-outline-light ms-5" type="submit">Stop</button>
+				</form></div>
 			</div>
 		</div>
 	</div>
