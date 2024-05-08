@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cowrie
+  labels:
+    app: cowrie  
+spec:
+  containers:
+  - name: cowrie
+    image: rduran02/honeyflow-cowrie:latest
+    ports:
+      - containerPort: 22

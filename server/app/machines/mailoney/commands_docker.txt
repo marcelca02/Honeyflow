@@ -5,4 +5,4 @@ docker network create -d bridge honeypot-network
 docker build -t mailoney .
 
 #Docker run
-docker run -it --network=honeypot-network mailoney --name mailoney
+docker run -itd --network=honeypot-network mailoney --name mailoney

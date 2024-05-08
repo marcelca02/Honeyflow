@@ -44,3 +44,4 @@ Werkzeug==3.0.1
 mysql.connector==2.2.9
 telnetlib3==2.0.4
 pandas
+docker==7.0.0
