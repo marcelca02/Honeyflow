@@ -3,11 +3,11 @@
 {% block content %}
 <div class="p-5 mb-4 bg-body-tertiary rounded-3">
   <div class="container-fluid py-5">
-    <h2 class="display-5 fw-bold">Resultados del Análisis por IP:Puerto</h2>
-    <p class="col-md-8 fs-4">Visualización de los datos procesados a partir del archivo de registro.</p>
-    <div class="d-flex justify-content-end mb-3">
-      <a href="{{ url_for('graficos_cowrie') }}" class="btn btn-primary">Gráficos Cowrie</a>
-    </div>
+    <h2 class="display-5 fw-bold"> Datos del analisis: Mailoney</h2>   
+    <p class="col-md-12 fs-5 mt-4">Disponemos de una tabla que nos muestra los Mails maliciosos y su contenido, ademas de mostar el IP:Puerto origen del mail.</p>
+    <!-- <div class="d-flex justify-content-end mb-3"> -->
+    <!--   <a href="{{ url_for('graficos_cowrie') }}" class="btn btn-primary">Gráficos Cowrie</a> -->
+    <!-- </div> -->
     {% if dataframe is not none and not dataframe.empty %}
       <div class="row">
         <div class="col-md-12">
@@ -40,6 +40,7 @@
     {% else %}
       <p>No hay datos disponibles o el DataFrame está vacío.</p>
     {% endif %}
+    <a href="{{ url_for('honeypots_analysis') }}" class="btn btn-outline-secondary float-end mt-4" type="button">Volver</a>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7RduPuemT//+jJXB16zg6i8UQD3lV5uDC3Yc7bz1Eeow" crossorigin="anonymous"></script>
