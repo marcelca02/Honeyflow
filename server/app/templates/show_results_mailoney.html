@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-body-tertiary rounded-3">
+  <div class="container-fluid py-5">
+    <h2 class="display-5 fw-bold">Resultados del Análisis por IP:Puerto</h2>
+    <p class="col-md-8 fs-4">Visualización de los datos procesados a partir del archivo de registro.</p>
+    <div class="d-flex justify-content-end mb-3">
+      <a href="{{ url_for('graficos_cowrie') }}" class="btn btn-primary">Gráficos Cowrie</a>
+    </div>
+    {% if dataframe is not none and not dataframe.empty %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>IP:Puerto</th>
+                  <th>HELO</th>
+                  <th>MAIL FROM</th>
+                  <th>RCPT TO</th>
+                  <th>DATA</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for index, row in dataframe.iterrows() %}
+                  <tr>
+                    <td>{{ row['IP:Puerto'] }}</td>
+                    <td>{{ row['HELO'] }}</td>
+                    <td>{{ row['MAIL FROM'] }}</td>
+                    <td>{{ row['RCPT TO'] }}</td>
+                    <td>{{ row['DATA'] }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p>No hay datos disponibles o el DataFrame está vacío.</p>
+    {% endif %}
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybBud7RduPuemT//+jJXB16zg6i8UQD3lV5uDC3Yc7bz1Eeow" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script>
+  // Activar las pestañas de Bootstrap al cargar la página
+  document.addEventListener('DOMContentLoaded', function () {
+    var myTab = new bootstrap.Tab(document.getElementById('myTab'));
+    myTab.show();
+  });
+</script>
+{% endblock %}
