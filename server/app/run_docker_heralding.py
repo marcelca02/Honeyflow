@@ -1,4 +1,5 @@
 import docker
+import os
 
 def crear_heralding():
 	client = docker.from_env()
@@ -24,7 +25,9 @@ def crear_heralding():
 	if not images:
 		# Construye la imagen si no existe
 		print("Creando imagen...")
-		client.images.build(path='machines/heralding/.', tag='heralding', rm=True)
+		directorio_actual = os.path.abspath(os.path.dirname(__file__))
+		ruta_dockerfile = os.path.join(directorio_actual, 'machines', 'heralding')
+		client.images.build(path=ruta_dockerfile, tag='heralding', rm=True)
 	
 	# Ejecuta el contenedor con el nombre especificado
 	print("Run container...")
