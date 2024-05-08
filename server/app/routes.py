@@ -1,5 +1,5 @@
 import subprocess
-import docker
+#import docker
 import json
 import os
 from flask import render_template, request, jsonify, abort
@@ -209,8 +209,8 @@ def show_results_heralding():
 
 @app.route('/show_results_mailoney')
 def show_results_mailoney():
-    #processo = subprocess.run(['docker', 'cp', 'mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
-    #if processo.returncode == 0:
+    processo = subprocess.run(['docker', 'cp', 'mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
+    if processo.returncode == 0:
         log_file_path = os.path.join('app', 'data_analysis', 'mailoney', 'mailoney.log')
         
         if os.path.exists(log_file_path):
@@ -259,8 +259,7 @@ def show_results_mailoney():
                 # Crear DataFrame a partir de la lista de diccionarios
                 df = pd.DataFrame(data_list)
                     
-                print(df)
-                print(data)
+                
                 
                 # Renderizar la plantilla HTML y pasar el DataFrame como contexto
                 return render_template('show_results_mailoney.html', dataframe=df)
