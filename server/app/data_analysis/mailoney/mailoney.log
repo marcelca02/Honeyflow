@@ -1,12 +1,28 @@
-[1714562904.9127][172.18.0.1:42310] HELO example.com
-[1714562904.9138567][172.18.0.1:42310] MAIL FROM: <correofalso@gmail.com>
-[1714562904.9147565][172.18.0.1:42310] RCPT TO: <victima@gmail.com>
-[1714562904.9157255][172.18.0.1:42310] DATA + Estimado usuario, Su cuenta ha sido comprometida. Por favor, haga clic en el siguiente enlace para recuperar el acceso a su cuenta: http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte
-[1714564596.9499664][172.18.0.1:39158] HELO example.com
-[1714564596.9511414][172.18.0.1:39158] MAIL FROM: <correoetest@gmail.com>
-[1714564596.9521003][172.18.0.1:39158] RCPT TO: <test@gmail.com>
-[1714564596.9531596][172.18.0.1:39158] DATA + Estimado usuario, Su cuenta ha sido comprometida. Por favor, haga clic en el siguiente enlace para recuperar el acceso a su cuenta: http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte
-[1714564666.6997147][172.18.0.1:45212] HELO example.com
-[1714564666.7009563][172.18.0.1:45212] MAIL FROM: <correofalso@gmail.com>
-[1714564666.701985][172.18.0.1:45212] RCPT TO: <victima@gmail.com>
-[1714564666.7028449][172.18.0.1:45212] DATA + Estimado usuario, Su cuenta ha sido comprometida. Por favor, haga clic en el siguiente enlace para recuperar el acceso a su cuenta: http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte
+[1715095391.2262676][172.18.0.1:56234] HELO example.com
+[1715095391.228189][172.18.0.1:56234] MAIL FROM: <correofalso@gmail.com>
+[1715095391.229503][172.18.0.1:56234] RCPT TO: <victima@gmail.com>
+[1715095391.2299876][172.18.0.1:56234] DATA + Estimado usuario, Su cuenta ha sido comprometida. Por favor, haga clic en el siguiente enlace para recuperar el acceso a su cuenta: http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte
+[1715164236.2987087][172.18.0.1:51252] ehlo kali.kali
+[1715164236.3432367][172.18.0.1:51252] mail FROM:<correofalso@gmail.com> size=396
+[1715164236.3435287][172.18.0.1:51252] rcpt TO:<victima@gmail.com>
+[1715164236.3437068][172.18.0.1:51252] data
+[1715164308.5052426][172.18.0.1:52008] ehlo kali.kali
+[1715164308.5502229][172.18.0.1:52008] mail FROM:<correofalso@gmail.com> size=398
+[1715164308.5506585][172.18.0.1:52008] rcpt TO:<victima@gmail.com>
+[1715164308.5509005][172.18.0.1:52008] data
+[1715164445.090385][172.18.0.1:43990] ehlo kali.kali
+[1715164445.135318][172.18.0.1:43990] mail FROM:<correofalso@gmail.com> size=398
+[1715164445.1355696][172.18.0.1:43990] rcpt TO:<victima@gmail.com>
+[1715164445.13573][172.18.0.1:43990] data
+[1715164452.7870252][172.18.0.1:44002] ehlo kali.kali
+[1715164452.8313982][172.18.0.1:44002] mail FROM:<correofalso@gmail.com> size=398
+[1715164452.8317592][172.18.0.1:44002] rcpt TO:<victima@gmail.com>
+[1715164452.8319948][172.18.0.1:44002] data
+[1715164552.5001419][172.18.0.1:57700] ehlo kali.kali
+[1715164552.5433104][172.18.0.1:57700] mail FROM:<correofalso@gmail.com> size=398
+[1715164552.5435917][172.18.0.1:57700] rcpt TO:<victima@gmail.com>
+[1715164552.5437934][172.18.0.1:57700] data
+[1715164657.7499914][172.18.0.1:32774] HELO example.com
+[1715164657.7513304][172.18.0.1:32774] MAIL FROM: <correofalso@gmail.com>
+[1715164657.7522836][172.18.0.1:32774] RCPT TO: <victima@gmail.com>
+[1715164657.7533321][172.18.0.1:32774] DATA + SrEstimado usuario, Su cuenta ha sido comprometida. Por favor, haga clic en el siguiente enlace para recuperar el acceso a su cuenta: http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte
