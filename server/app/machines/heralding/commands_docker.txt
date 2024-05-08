@@ -5,4 +5,4 @@ docker network create -d bridge honeypot-network
 docker build -t heralding .
 
 #Docker run
-docker run -it --network=honeypot-network heralding --name heralding
+docker run -itd --network=honeypot-network heralding

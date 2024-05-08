@@ -5,4 +5,4 @@ docker network create -d bridge honeypot-network
 docker build -t cowrie .
 
 #Docker run
-docker run -it --network=honeypot-network cowrie --name cowrie
+docker run -itd --network=honeypot-network cowrie --name cowrie
