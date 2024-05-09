@@ -1,4 +1,5 @@
 import subprocess
+from app import kubernetes
 import docker
 import json
 import os
@@ -8,6 +9,7 @@ from app.intrusion_detection import start_detection, ssh_brute_force_detection, 
 from app.db import DBMethods
 import pandas as pd
 import re
+from app.kubernetes import create_mailoney_pod, create_cowrie_pod, create_heralding_pod, delete_pods, delete_pods
 
 # Variable global para saber si el docker del honeypot esta corriendo o no
 docker_running_c = False
@@ -25,6 +27,18 @@ def configurar_honeypots():
 @app.route('/about_project')
 def about_project():
     return render_template('about_project.html')
+
+@app.route('/init_k8s')
+def init_k8s():
+    create_heralding_pod();
+    create_cowrie_pod();
+    create_mailoney_pod();
+    return "Todos los honeypots han sido lanzandos en kubernetes" 
+
+@app.route('/delete_k8s')
+def stop_k8s():
+    delete_pods(); 
+    return "Todos los pods han sido borrados"
 
 
 #@app.route('/deploy_honeypot')
@@ -91,6 +105,13 @@ def stop_docker():
         docker_running_m = False
 
     return render_template('stop_honeypot.html', running_honeypot=True)
+
+
+@app.route('/k8s_cowrie')
+def k8s_cowrie():
+    create_mailoney_pod()
+    return "Hello"
+    
 
 
 @app.route('/honeypots_analysis')
