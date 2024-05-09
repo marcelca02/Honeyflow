@@ -7,7 +7,7 @@ from app.config import COWRIE_IMAGE
 #     v1 = client.CoreV1Api()
 #     return v1
 
-def create_cowrie_pod(v1, namespace='default'):
+def create_cowrie_pod():
     subprocess.run(['kubectl', 'apply', '-f', 'app/machines/cowrie/pod_cowrie.yaml'])
     subprocess.run(['kubectl', 'apply', '-f', 'app/machines/cowrie/service_cowrie.yaml'])
 
