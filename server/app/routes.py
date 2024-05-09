@@ -28,18 +28,16 @@ def about_project():
     return render_template('about_project.html')
 
 @app.route('/init_k8s')
-def init_k8s() {
+def init_k8s():
     create_heralding_pod();
     create_cowrie_pod();
     create_mailoney_pod();
     return "Todos los honeypots han sido lanzandos en kubernetes" 
-}
 
 @app.route('/delete_k8s')
-def stop_k8s() {
+def stop_k8s():
     delete_pods(); 
     return "Todos los pods han sido borrados"
-}
 
 
 #@app.route('/deploy_honeypot')
