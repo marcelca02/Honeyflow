@@ -83,6 +83,13 @@ def stop_docker():
     contenedor = client.containers.get(f'{h_name}')
     contenedor.stop()
 
+    if h_name == 'cowrie':
+        docker_running_c = False
+    if h_name == 'heralding':
+        docker_running_h = False
+    if h_name == 'mailoney':
+        docker_running_m = False
+
     return render_template('stop_honeypot.html', running_honeypot=True)
 
 
