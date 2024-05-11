@@ -1,45 +1,49 @@
 import pyshark as psh
+import threading
+import asyncio
+from datetime import datetime
 from flask import json
 from collections import defaultdict
 
 ip = ''
 
 def start_detection(interface,ip,timeout):
-    # TODO: machine_id based detection
-    print("Starting packet capture\n")
+    while (1):
+        print("Starting packet capture\n")
+        cap = psh.LiveCapture(interface=interface)
+        cap.sniff(timeout=timeout)
+        packets = [pkt for pkt in cap._packets]
+        cap.close()
 
-    cap = psh.LiveCapture(interface=interface)
-    cap.sniff(timeout=timeout)
-    packets = [pkt for pkt in cap._packets]
-    cap.close()
-    
-    ip = ip
-    attempts = ssh_brute_force_detection(packets)
-    open_ports = port_scaning_detection(packets)
-    tcp_sources = dns_tunneling_detection(packets)
-    suspicious_smtp = smtp_spam_detection(packets)  
-    suspicious_http = http_attack_detection(packets)  
-    # TODO: Add more detection methods
+        ip = ip
+        attempts = ssh_brute_force_detection(packets)
+        open_ports = port_scaning_detection(packets)
+        tcp_sources = dns_tunneling_detection(packets)
+        suspicious_smtp = smtp_spam_detection(packets)  
+        suspicious_http = http_attack_detection(packets)  
 
-    return json.dumps({
-        'ssh_brute_force': {
-            'attempts': list(attempts.items())
-        },
-        'port_scaning': {
-            'open_ports': list(open_ports.items())
-        },
-        'dns_tunneling': {
-            'tcp_sources': list(tcp_sources.items())
-        },
-        'smtp_spam': {
-            'suspicious_ips': list(suspicious_smtp)
-        },
-        'http_attacks': {
-            'suspicious_ips': suspicious_http["suspicious_ips"],  
-            'injected_commands': dict(suspicious_http["injected_commands"]),  
-            'attempted_directories': dict(suspicious_http["attempted_directories"])  
-        }
-    })
+        # Save the results to a JSON file dated 
+        file_path = 'results/' + ip + '_' + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '.json'
+        with open(file_path, "w") as file:
+            json.dump({
+                'ssh_brute_force': {
+                    'attempts': list(attempts.items())
+                },
+                'port_scaning': {
+                    'open_ports': list(open_ports.items())
+                },
+                'dns_tunneling': {
+                    'tcp_sources': list(tcp_sources.items())
+                },
+                'smtp_spam': {
+                    'suspicious_ips': list(suspicious_smtp)
+                },
+                'http_attacks': {
+                    'suspicious_ips': suspicious_http["suspicious_ips"],  
+                    'injected_commands': dict(suspicious_http["injected_commands"]),  
+                    'attempted_directories': dict(suspicious_http["attempted_directories"])  
+                }
+            }, file)
 
 def ssh_brute_force_detection(packets):
     attempts = {}
@@ -223,3 +227,4 @@ def http_attack_detection(packets):
     suspicious_data["suspicious_ips"] = list(set(suspicious_data["suspicious_ips"]))
 
     return suspicious_data
+

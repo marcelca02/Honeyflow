@@ -1,5 +1,6 @@
 import subprocess
 from app import kubernetes
+import threading 
 import docker
 import json
 import os
@@ -19,6 +20,13 @@ docker_running_m = False
 @app.route('/')
 def home():
     return render_template('index.html')
+
+# Ruta de prueba
+@app.route('/intrusion_detection')
+def intrusion_detection():
+    t = threading.Thread(target=start_detection, args=('wlp2s0', '192.168.1.142', 5))
+    t.start()
+    return "Intrusion detection started"
 
 @app.route('/configurar_honeypots')
 def configurar_honeypots():
