@@ -8,7 +8,7 @@ spec:
     app: cowrie
   ports:
     - port: 8084  # Puerto que el Service expone externamente
-      targetPort: 22  # Puerto interno al que apunta el Service
-      nodePort: 30166  # Puerto en el nodo
+      targetPort: 2222  # Puerto interno al que apunta el Service
+      nodePort: 30167  # Puerto en el nodo
   externalIPs:
     - 172.16.4.54 # IP externa a la que quieres asociar el Service
