@@ -1,0 +1,1 @@
+{"ssh_brute_force": {"attempts": []}, "port_scaning": {"open_ports": []}, "dns_tunneling": {"tcp_sources": []}, "smtp_spam": {"suspicious_ips": []}, "http_attacks": {"suspicious_ips": [], "injected_commands": {}, "attempted_directories": {}}}

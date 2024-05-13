@@ -132,7 +132,17 @@ def honeypots_analysis():
         # Agrega más honeypots según sea necesario con sus nombres y rutas HTML correspondientes
     ]
 
-    return render_template('honeypots_analysis.html', honeypots=honeypots)
+    # Diccionario de detecciones de intrusiones con sus nombres y archivos JSON asociados
+    detections = []
+    for file in os.listdir('results'):
+        if file.endswith('.json'):
+            ip = file.split('_')[0]
+            date = file.split('_')[1]
+            hour = file.split('_')[2].replace('.json', '')
+            name = f'Host: {ip} - Date: {date} - Hour: {hour}'
+            detections.append({'file': file, 'name': name})
+    date_filter = request.args.get('date_filter')
+    return render_template('honeypots_analysis.html', honeypots=honeypots, detections=detections, date_filter=date_filter)
 
 @app.route('/show_results_cowrie')
 def show_results_cowrie():

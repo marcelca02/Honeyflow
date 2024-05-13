@@ -9,7 +9,33 @@
         <a href="{{ url_for(honeypot['html_route']) }}" class="list-group-item list-group-item-action">{{ honeypot['name'] }}</a>
       {% endfor %}
     </div>
+  </div>
+  <div class="container-fluid py-5">
+    <div class="row">
+      <div class="col-md-6">
+        <p class="fs-4">Detección de intrusiones</p>
+      </div>
+      <div class="col-md-6">
+        <form method="GET">
+          <div class="input-group mb-3">
+            <input type="date" class="form-control" name="date_filter" placeholder="Seleccione una fecha">
+            <button class="btn btn-outline-secondary" type="submit">Filtrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="list-group">
+      {% for detection in detections %}
+          {% set detection_date = detection['name'].split(' ')[4] %}
+          {% if date_filter and date_filter.replace('/', '-') == detection_date %}
+            <a href="/" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
+          {% elif not date_filter %}
+            <a href="/" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
+          {% endif %}
+      {% endfor %}
+    </div>
     <a href="{{ url_for('home') }}" class="btn btn-outline-secondary float-end mt-4" type="button">Volver</a>
   </div>
 </div>
 {% endblock %}
+

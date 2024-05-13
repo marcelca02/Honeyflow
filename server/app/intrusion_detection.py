@@ -1,6 +1,4 @@
 import pyshark as psh
-import threading
-import asyncio
 from datetime import datetime
 from flask import json
 from collections import defaultdict
@@ -23,7 +21,7 @@ def start_detection(interface,ip,timeout):
         suspicious_http = http_attack_detection(packets)  
 
         # Save the results to a JSON file dated 
-        file_path = 'results/' + ip + '_' + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '.json'
+        file_path = 'results/' + ip + '_' + datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + '.json'
         with open(file_path, "w") as file:
             json.dump({
                 'ssh_brute_force': {
