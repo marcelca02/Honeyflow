@@ -28,9 +28,9 @@
       {% for detection in detections %}
           {% set detection_date = detection['name'].split(' ')[4] %}
           {% if date_filter and date_filter.replace('/', '-') == detection_date %}
-            <a href="/" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
+            <a href= "{{ url_for('show_detection', detection_file=detection['file']) }}" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
           {% elif not date_filter %}
-            <a href="/" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
+            <a href= "{{ url_for('show_detection', detection_file=detection['file']) }}" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
           {% endif %}
       {% endfor %}
     </div>

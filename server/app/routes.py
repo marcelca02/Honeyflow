@@ -48,6 +48,18 @@ def stop_k8s():
     delete_pods(); 
     return "Todos los pods han sido borrados"
 
+@app.route('/show_detection/<detection_file>', methods=['GET'])
+def show_detection(detection_file):
+    json = ''
+    path = os.path.join('results', detection_file)
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            json = file.read()
+            return render_template('show_detection.html', json=json)
+    else:
+        return "Archivo no encontrado", 404
+    
+
 
 #@app.route('/deploy_honeypot')
 #def deploy_honeypot():
