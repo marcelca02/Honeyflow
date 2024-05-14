@@ -24,22 +24,22 @@ def start_detection(interface,ip,timeout):
         file_path = 'results/' + ip + '_' + datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + '.json'
         with open(file_path, "w") as file:
             json.dump({
-                'ssh_brute_force': {
-                    'attempts': list(attempts.items())
+                'SSH Brute Force': {
+                    'Attempts': list(attempts.items())
                 },
-                'port_scaning': {
-                    'open_ports': list(open_ports.items())
+                'Port Scaning': {
+                    'Open Ports': list(open_ports.items())
                 },
-                'dns_tunneling': {
-                    'tcp_sources': list(tcp_sources.items())
+                'Dns Tunneling': {
+                    'Tcp Sources': list(tcp_sources.items())
                 },
-                'smtp_spam': {
-                    'suspicious_ips': list(suspicious_smtp)
+                'Smtp Spam': {
+                    'Suspicious IPs': list(suspicious_smtp)
                 },
-                'http_attacks': {
-                    'suspicious_ips': suspicious_http["suspicious_ips"],  
-                    'injected_commands': dict(suspicious_http["injected_commands"]),  
-                    'attempted_directories': dict(suspicious_http["attempted_directories"])  
+                'Http Attacks': {
+                    'Suspicious IPs': suspicious_http["suspicious_ips"],  
+                    'Injected Commands': dict(suspicious_http["injected_commands"]),  
+                    'Attempted Directories': dict(suspicious_http["attempted_directories"])  
                 }
             }, file)
 

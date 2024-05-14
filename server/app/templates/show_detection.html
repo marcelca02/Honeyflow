@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-body-tertiary rounded-3">
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Tipo de Ataque</th>
+      <th>Información del ataque</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for key, value in json.items() %}
+    {% for sub_key, sub_value in value.items() %}
+    <tr>
+        <td>{{ key }}</td>
+        <td>{{ sub_key }} : {{ sub_value }}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{{ url_for('home') }}" class="btn btn-outline-secondary float-end mt-4" type="button">Volver</a>
+</div>
+{% endblock %}
+
