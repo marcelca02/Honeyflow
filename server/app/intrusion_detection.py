@@ -5,7 +5,9 @@ from collections import defaultdict
 
 ip = ''
 
-def start_detection(interface,ip,timeout,event):
+def start_detection(timeout, event):
+    interface = 'wlp2s0'
+    ip = '192.168.1.142'
     while (1):
         if event.is_set():
             break
@@ -13,7 +15,7 @@ def start_detection(interface,ip,timeout,event):
         print("Starting packet capture\n")
         cap = psh.LiveCapture(interface=interface)
         packets = []
-        for pkt in cap.sniff_continuously(packet_count=500):
+        for pkt in cap.sniff_continuously(packet_count=750):
             packets.append(pkt)
             if event.is_set():
                 print("Stopping packet capture\n")
@@ -30,7 +32,7 @@ def start_detection(interface,ip,timeout,event):
         suspicious_http = http_attack_detection(packets)  
 
         # Save the results to a JSON file dated 
-        file_path = 'results/' + ip + '_' + datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + '.json'
+        file_path = 'app/data_analysis/detection/' + ip + '_' + datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + '.json'
         with open(file_path, "w") as file:
             json.dump({
                 'SSH Brute Force': {

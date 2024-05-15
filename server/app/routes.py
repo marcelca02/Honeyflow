@@ -6,8 +6,7 @@ import json
 import os
 from flask import render_template, request, redirect
 from app import app
-from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
-from app.db import DBMethods
+from app.intrusion_detection import start_detection
 import pandas as pd
 import re
 from app.kubernetes import create_mailoney_pod, create_cowrie_pod, create_heralding_pod, delete_pods, delete_pods
@@ -36,7 +35,7 @@ def home():
 @app.route('/start_intrusion_detection', methods=['POST'])
 def start_intrusion_detection():
     event.clear()
-    t['thread'] = threading.Thread(target=start_detection, args=('wlp2s0', '192.168.1.142', 60, event))
+    t['thread'] = threading.Thread(target=start_detection, args=(60, event))
     t['thread'].start()
     t['detection_running'] = True
     if request.referrer:
@@ -77,7 +76,7 @@ def stop_k8s():
 
 @app.route('/show_detection/<detection_file>', methods=['GET'])
 def show_detection(detection_file):
-    path = os.path.join('results', detection_file)
+    path = os.path.join('app/data_analysis/detection', detection_file)
     if os.path.exists(path):
         with open(path, 'r') as file:
             data = json.load(file)
@@ -172,7 +171,7 @@ def honeypots_analysis():
 
     # Diccionario de detecciones de intrusiones con sus nombres y archivos JSON asociados
     detections = []
-    for file in os.listdir('results'):
+    for file in os.listdir('app/data_analysis/detection'):
         if file.endswith('.json'):
             ip = file.split('_')[0]
             date = file.split('_')[1]
