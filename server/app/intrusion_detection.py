@@ -1,4 +1,6 @@
 import pyshark as psh
+
+from app.config import CONTAINER_IP, INTERFACE
 from datetime import datetime
 from flask import json
 from collections import defaultdict
@@ -6,8 +8,8 @@ from collections import defaultdict
 ip = ''
 
 def start_detection(timeout, event):
-    interface = 'wlp2s0'
-    ip = '192.168.1.142'
+    interface = INTERFACE
+    ip = CONTAINER_IP
     while (1):
         if event.is_set():
             break
