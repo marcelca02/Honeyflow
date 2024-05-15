@@ -42,6 +42,16 @@ def start_intrusion_detection():
         return redirect(request.referrer)
     else:
         return redirect('/')
+
+@app.route('/delete_intrusion/<detection_file>', methods=['POST'])
+def delete_intrusion(detection_file):
+    path = os.path.join('app/data_analysis/detection', detection_file)
+    if os.path.exists(path):
+        os.remove(path)
+        return redirect('/honeypots_analysis')
+    else:
+        return "Archivo no encontrado", 404
+
  
 
 @app.route('/stop_intrusion_detection', methods=['POST'])

@@ -28,9 +28,21 @@
       {% for detection in detections %}
           {% set detection_date = detection['name'].split(' ')[4] %}
           {% if date_filter and date_filter.replace('/', '-') == detection_date %}
-            <a href= "{{ url_for('show_detection', detection_file=detection['file']) }}" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
+          <div class="d-flex align-items-center">
+            <a href= "{{ url_for('show_detection', detection_file=detection['file']) }}" class="list-group-item list-group-item-action ms-auto">{{ detection['name'] }}
+            </a>
+            <form action="{{ url_for('delete_intrusion', detection_file=detection['file']) }}" class="h-100" method="post">
+              <button class="btn btn-danger btn-sm float-right ms-auto" type="submit">Eliminar</button>
+            </form>
+          </div>
           {% elif not date_filter %}
-            <a href= "{{ url_for('show_detection', detection_file=detection['file']) }}" class="list-group-item list-group-item-action">{{ detection['name'] }}</a>
+          <div class="d-flex align-items-center">
+            <a href= "{{ url_for('show_detection', detection_file=detection['file']) }}" class="list-group-item list-group-item-action ms-auto">{{ detection['name'] }}
+            </a>
+            <form action="{{ url_for('delete_intrusion', detection_file=detection['file']) }}" class="h-100" method="post">
+              <button class="btn btn-danger btn-sm float-right ms-auto" type="submit">Eliminar</button>
+            </form>
+          </div>
           {% endif %}
       {% endfor %}
     </div>
