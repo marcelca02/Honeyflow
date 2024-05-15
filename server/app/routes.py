@@ -36,7 +36,7 @@ def home():
 @app.route('/start_intrusion_detection', methods=['POST'])
 def start_intrusion_detection():
     event.clear()
-    t['thread'] = threading.Thread(target=start_detection, args=('wlp2s0', '192.168.1.142', 10, event))
+    t['thread'] = threading.Thread(target=start_detection, args=('wlp2s0', '192.168.1.142', 60, event))
     t['thread'].start()
     t['detection_running'] = True
     if request.referrer:

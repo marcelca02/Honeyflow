@@ -1,0 +1,1 @@
+{"SSH Brute Force": {"Attempts": []}, "Port Scaning": {"Open Ports": []}, "Dns Tunneling": {"Tcp Sources": []}, "Smtp Spam": {"Suspicious IPs": []}, "Http Attacks": {"Suspicious IPs": [], "Injected Commands": {}, "Attempted Directories": {}}}
