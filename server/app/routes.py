@@ -4,7 +4,7 @@ import threading
 import docker
 import json
 import os
-from flask import render_template, request, jsonify, abort
+from flask import render_template, request, redirect
 from app import app
 from app.intrusion_detection import start_detection, ssh_brute_force_detection, port_scaning_detection, dns_tunneling_detection
 from app.db import DBMethods
@@ -17,16 +17,43 @@ docker_running_c = False
 docker_running_h = False
 docker_running_m = False
 
+
+# Thread que hace la deteccion de intrusiones
+t = {
+    'detection_running': False,
+    'thread': None
+}
+event = threading.Event() 
+
+@app.context_processor
+def inject_detection_running():
+    return {'detection_running': t['detection_running']}
+
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', thread=t['detection_running'])
 
-# Ruta de prueba
-@app.route('/intrusion_detection')
-def intrusion_detection():
-    t = threading.Thread(target=start_detection, args=('wlp2s0', '192.168.1.142', 5))
-    t.start()
-    return "Intrusion detection started"
+@app.route('/start_intrusion_detection', methods=['POST'])
+def start_intrusion_detection():
+    event.clear()
+    t['thread'] = threading.Thread(target=start_detection, args=('wlp2s0', '192.168.1.142', 10, event))
+    t['thread'].start()
+    t['detection_running'] = True
+    if request.referrer:
+        return redirect(request.referrer)
+    else:
+        return redirect('/')
+ 
+
+@app.route('/stop_intrusion_detection', methods=['POST'])
+def stop_intrusion_detection():
+    event.set()
+    t['thread'].join()
+    t['detection_running'] = False
+    if request.referrer:
+        return redirect(request.referrer)
+    else:
+        return redirect('/')
 
 @app.route('/configurar_honeypots')
 def configurar_honeypots():

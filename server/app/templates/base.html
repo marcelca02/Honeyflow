@@ -15,18 +15,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 
+    <!-- Estilo del botón: -->
+    <style type="text/css">
+        .btn-circle.btn-xl {
+          width: 65px;
+          height: 65px;
+          padding: 12px 3px;
+          border-radius: 60px;
+          font-size: 12px;
+          text-align: center;
+        }
+    </style>
   </head>
   <body>
-
 <main>
   <div class="container py-4">
     <header class="pb-3 mb-4 border-bottom">
-	  <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center">
         <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
           <img src="{{ url_for('static', filename='img/hf.png') }}" class="float-start me-2" alt="LOGO" style="height:50px;">
           <span class="display-5">HoneyFlow</span>
-      	</a>
-	  </div>
+        </a>
+        <div class="ms-auto">
+          {% if detection_running %}
+            <form action="{{ url_for('stop_intrusion_detection') }}" method="post">
+              <button type="submit" class="btn btn-success btn-circle btn-xl fw-bold">Parar</button>
+            </form>
+          {% else %}
+            <form action="{{ url_for('start_intrusion_detection') }}" method="post">
+              <button type="submit" class="btn btn-primary btn-circle btn-xl fw-bold">Detectar</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
     </header>
 
     {% block content %}
@@ -37,6 +58,5 @@
     </footer>
   </div>
 </main>
-
-    </body>
+</body>
 </html>

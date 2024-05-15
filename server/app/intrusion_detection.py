@@ -1,12 +1,16 @@
 import pyshark as psh
+import threading
 from datetime import datetime
 from flask import json
 from collections import defaultdict
 
 ip = ''
 
-def start_detection(interface,ip,timeout):
+def start_detection(interface,ip,timeout,event):
     while (1):
+        if event.is_set():
+            break
+
         print("Starting packet capture\n")
         cap = psh.LiveCapture(interface=interface)
         cap.sniff(timeout=timeout)
