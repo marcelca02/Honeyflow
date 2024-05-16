@@ -1,5 +1,6 @@
 import subprocess
 from app import kubernetes
+from kubernetes import client
 import threading 
 import docker
 import json
@@ -11,7 +12,7 @@ import pandas as pd
 import re
 from app.kubernetes import create_mailoney_pod, create_cowrie_pod, create_heralding_pod, delete_pods, delete_pods
 
-# Variable global para saber si el docker del honeypot esta corriendo o no
+# Variable global para saber si el del honeypot esta corriendo o no
 docker_running_c = False
 docker_running_h = False
 docker_running_m = False
@@ -101,31 +102,34 @@ def show_detection(detection_file):
 #    return render_template('deploy_honeypot.html')
 
 
-@app.route('/ejecutar_docker', methods=['POST'])
-def ejecutar_docker():
+@app.route('/ejecutar_pod', methods=['POST'])
+def ejecutar_pod():
     # indicamos que se usa la variable global
     global docker_running_c
     global docker_running_h 
     global docker_running_m
 
     h_name = request.form['h_name']
-    proceso = subprocess.run(['python3', f'app/run_docker_{h_name}.py'])
-    client = docker.from_env()
-    contenedor = client.containers.get(f'{h_name}')
+    proceso = subprocess.run(['python3', f'app/create_pod_{h_name}.py'])
 
-    if contenedor.status == 'running':
-        if h_name == 'cowrie':
-            docker_running_c = True
-        elif h_name == 'heralding':
-            docker_running_h = True
-        elif h_name == 'mailoney':
-            docker_running_m = True
-        return render_template('resultado_honeypot.html', exito=True)
-    else:
-        docker_running_h = False # no haria falta si ya es False por defecto
-        docker_running_c = False 
-        docker_running_m = False 
-        return render_template('resultado_honeypot.html', exito=False)
+    v1 = client.CoreV1Api()
+
+    pod_list = v1.list_pod_for_all_namespaces()
+    for pod in pod_list.items:
+        if pod.metadata.name == h_name:
+            if pod.status.phase == 'Running':
+                if h_name == 'cowrie':
+                    docker_running_c = True
+                elif h_name == 'heralding':
+                    docker_running_h = True
+                elif h_name == 'mailoney':
+                    docker_running_m = True
+                return render_template('resultado_honeypot.html', exito=True)
+            else:
+                docker_running_h = False # no haria falta si ya es False por defecto
+                docker_running_c = False 
+                docker_running_m = False 
+                return render_template('resultado_honeypot.html', exito=False)
 
 
 #@app.route('/stop_honeypot')
@@ -133,8 +137,8 @@ def ejecutar_docker():
 #    return render_template('stop_honeypot.html', docker_running=docker_running)
 
 
-@app.route('/stop_docker', methods=['POST'])
-def stop_docker():
+@app.route('/stop_pod', methods=['POST'])
+def stop_pod():
     global docker_running_c
     global docker_running_h
     global docker_running_m
@@ -143,14 +147,16 @@ def stop_docker():
 
     if h_name == 'cowrie' and docker_running_c == False:
         return render_template('stop_honeypot.html', running_honeypot=False) 
-    if h_name == 'heralding' and docker_running_h == False:
+    elif h_name == 'heralding' and docker_running_h == False:
         return render_template('stop_honeypot.html', running_honeypot=False) 
-    if h_name == 'mailoney' and docker_running_m == False:
+    elif h_name == 'mailoney' and docker_running_m == False:
         return render_template('stop_honeypot.html', running_honeypot=False) 
 
-    client = docker.from_env()
-    contenedor = client.containers.get(f'{h_name}')
-    contenedor.stop()
+   # client = docker.from_env()
+   # contenedor = client.containers.get(f'{h_name}')
+   # contenedor.stop()
+    v1 = client.CoreV1Api()
+    v1.delete_namespaced_pod(name=h_name, namespace=None)
 
     if h_name == 'cowrie':
         docker_running_c = False

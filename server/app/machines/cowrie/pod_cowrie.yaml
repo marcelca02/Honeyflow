@@ -7,6 +7,15 @@ metadata:
 spec:
   containers:
   - name: cowrie
-    image: rduran02/honeyflow-cowrie:latest
+    image: cowrie/cowrie:latest
     ports:
       - containerPort: 22
+      - containerPort: 2222
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "200m"
+        memory: "256Mi"  
+  restartPolicy: Always
