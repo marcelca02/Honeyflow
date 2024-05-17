@@ -1,6 +1,5 @@
 import subprocess
 from app import kubernetes
-from kubernetes import client
 import threading 
 import docker
 import json
@@ -10,7 +9,6 @@ from app import app
 from app.intrusion_detection import start_detection
 import pandas as pd
 import re
-from app.kubernetes import create_mailoney_pod, create_cowrie_pod, create_heralding_pod, delete_pods, delete_pods
 
 # Variable global para saber si el del honeypot esta corriendo o no
 docker_running_c = False
@@ -73,17 +71,17 @@ def configurar_honeypots():
 def about_project():
     return render_template('about_project.html')
 
-@app.route('/init_k8s')
-def init_k8s():
-    create_heralding_pod();
-    create_cowrie_pod();
-    create_mailoney_pod();
-    return "Todos los honeypots han sido lanzandos en kubernetes" 
-
-@app.route('/delete_k8s')
-def stop_k8s():
-    delete_pods(); 
-    return "Todos los pods han sido borrados"
+# @app.route('/init_k8s')
+# def init_k8s():
+#     create_heralding_pod();
+#     create_cowrie_pod();
+#     create_mailoney_pod();
+#     return "Todos los honeypots han sido lanzandos en kubernetes" 
+#
+# @app.route('/delete_k8s')
+# def stop_k8s():
+#     delete_pods(); 
+#     return "Todos los pods han sido borrados"
 
 @app.route('/show_detection/<detection_file>', methods=['GET'])
 def show_detection(detection_file):
@@ -200,9 +198,12 @@ def honeypots_analysis():
 @app.route('/show_results_cowrie')
 def show_results_cowrie():
     # Ejecutar comando docker para copiar archivo JSON
-    processo = subprocess.run(['docker', 'cp', 'cowrie:/home/cowrie/cowrie/var/log/cowrie/cowrie.json', 'app/data_analysis/cowrie/cowrie.json'])
+    # proceso = subprocess.run(['docker', 'cp', 'cowrie:/home/cowrie/cowrie/var/log/cowrie/cowrie.json', 'app/data_analysis/cowrie/cowrie.json'])
+
+    # Ejecutar comando de kubernetes para copiar archivo JSON 
+    proceso = subprocess.run(['kubectl', 'cp', 'default/cowrie:/home/cowrie/cowrie/var/log/cowrie/cowrie.json', 'app/data_analysis/cowrie/cowrie.json'])
     
-    if processo.returncode == 0:
+    if proceso.returncode == 0:
         json_file_path = os.path.join('app', 'data_analysis', 'cowrie', 'cowrie.json')
         
         # Verificar si el archivo existe
@@ -261,8 +262,12 @@ def show_results_cowrie():
 
 @app.route('/show_results_heralding')
 def show_results_heralding():
-    processo = subprocess.run(['docker', 'cp', 'heralding:/log_session.json', 'app/data_analysis/heralding/heralding.json'])
-    if processo.returncode == 0:
+    # proceso = subprocess.run(['docker', 'cp', 'heralding:/log_session.json', 'app/data_analysis/heralding/heralding.json'])
+
+    # Ejecutar comando de kubernetes para copiar archivo JSON
+    proceso = subprocess.run(['kubectl', 'cp', 'default/heralding:/log_session.json', 'app/data_analysis/heralding/heralding.json'])
+
+    if proceso.returncode == 0:
         json_file_path = os.path.join('app', 'data_analysis', 'heralding', 'heralding.json')
         
         # Verificar si el archivo existe
@@ -308,8 +313,13 @@ def show_results_heralding():
 
 @app.route('/show_results_mailoney')
 def show_results_mailoney():
-    processo = subprocess.run(['docker', 'cp', 'mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
-    if processo.returncode == 0:
+    # proceso = subprocess.run(['docker', 'cp', 'mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
+
+    # Ejecutar comando de kubernetes para copiar archivo de registro
+    proceso = subprocess.run(['kubectl', 'cp', 'default/mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
+
+
+    if proceso.returncode == 0:
         log_file_path = os.path.join('app', 'data_analysis', 'mailoney', 'mailoney.log')
         
         if os.path.exists(log_file_path):
