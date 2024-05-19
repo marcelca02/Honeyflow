@@ -1,5 +1,6 @@
 import subprocess
 from app import kubernetes
+from kubernetes import client, config
 import threading 
 import docker
 import json
@@ -110,6 +111,7 @@ def ejecutar_pod():
     h_name = request.form['h_name']
     proceso = subprocess.run(['python3', f'app/create_pod_{h_name}.py'])
 
+	config.load_kube_config() # carga kube config
     v1 = client.CoreV1Api()
 
     pod_list = v1.list_pod_for_all_namespaces()
@@ -153,6 +155,7 @@ def stop_pod():
    # client = docker.from_env()
    # contenedor = client.containers.get(f'{h_name}')
    # contenedor.stop()
+	config.load_kube_config() # carga kube config
     v1 = client.CoreV1Api()
     v1.delete_namespaced_pod(name=h_name, namespace=None)
 
