@@ -10,6 +10,9 @@ from app import app
 from app.intrusion_detection import start_detection
 import pandas as pd
 import re
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
 
 # Variable global para saber si el del honeypot esta corriendo o no
 docker_running_c = False
@@ -402,7 +405,65 @@ def show_results_mailoney():
 
 @app.route('/graficos_cowrie')
 def graficos_cowrie():
-    return render_template('graficos_cowrie.html')
+    # Definir el path del archivo JSON
+    json_file_path = os.path.join('app', 'data_analysis', 'heralding', 'heralding.json')
+
+    # Leer los datos desde el archivo JSON
+    if os.path.exists(json_file_path):
+        with open(json_file_path, 'r') as file:
+            data = [json.loads(line) for line in file]
+
+        # Contar las ocurrencias de los protocolos
+        protocol_counts = {
+            'http': 0,
+            'mysql': 0,
+            'other': 0
+        }
+
+        for entry in data:
+            protocol = entry.get('protocol', '').lower()
+            if protocol == 'http':
+                protocol_counts['http'] += 1
+            elif protocol == 'mysql':
+                protocol_counts['mysql'] += 1
+            elif protocol:
+                protocol_counts['other'] += 1
+
+        # Total de entradas no vacías
+        total_non_empty = protocol_counts['http'] + protocol_counts['mysql'] + protocol_counts['other']
+
+        # Datos para el gráfico
+        labels = ['HTTP', 'MySQL', 'Otros']
+        sizes = [
+            protocol_counts['http'] / total_non_empty * 100,
+            protocol_counts['mysql'] / total_non_empty * 100,
+            protocol_counts['other'] / total_non_empty * 100
+        ]
+        colors = ['#ff9999','#66b3ff','#99ff99']
+        explode = (0.1, 0.1, 0.1)  # "explode" a bit the slices
+        # Crear el gráfico de rosco
+        fig, ax = plt.subplots()
+        wedges, texts, autotexts = ax.pie(sizes, explode=explode, colors=colors,
+                                          autopct='%1.1f%%',pctdistance=0.85, shadow=True, startangle=90,
+                                          wedgeprops=dict(width=0.5))
+        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+        # Agregar leyenda
+        plt.legend(labels, loc='center left', bbox_to_anchor=(1, 0.5), title='Protocolos')
+        for autotext in autotexts:
+            autotext.set_color('black')
+ # Guardar el gráfico en un objeto BytesIO
+        img = BytesIO()
+        plt.savefig(img, format='png', bbox_inches='tight')
+        img.seek(0)
+
+        # Codificar la imagen en base64
+        img_base64 = base64.b64encode(img.getvalue()).decode('utf-8')
+        return render_template('graficos_heralding.html', img_data=img_base64)
+
+    else:
+        return "Archivo JSON no encontrado", 404
+
 
 @app.route('/graficos_heralding')
 def graficos_heralding():
