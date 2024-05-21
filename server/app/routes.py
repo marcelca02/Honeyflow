@@ -316,7 +316,6 @@ def show_results_heralding():
         print("Error al ejecutar comando docker")
         return "Error al ejecutar comando docker", 500
 
-
 @app.route('/show_results_mailoney')
 def show_results_mailoney():
     # proceso = subprocess.run(['docker', 'cp', 'mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
@@ -324,71 +323,81 @@ def show_results_mailoney():
     # Ejecutar comando de kubernetes para copiar archivo de registro
     proceso = subprocess.run(['kubectl', 'cp', 'default/mailoney:/var/log/mailoney/commands.log', 'app/data_analysis/mailoney/mailoney.log'])
 
-
     if proceso.returncode == 0:
         log_file_path = os.path.join('app', 'data_analysis', 'mailoney', 'mailoney.log')
-        
+
         if os.path.exists(log_file_path):
             try:
-                pattern = r'\[(.*?)\]\[(.*?)\] (.*)'
-                regex = re.compile(pattern)
-                
-                data = {}
-                
+                patterns_mail = {
+                    'HELO': re.compile(r'\[(.*?)\]\[(.*?)\] HELO (.*)'),
+                    'MAIL FROM': re.compile(r'\[(.*?)\]\[(.*?)\] MAIL FROM: <(.*?)>'),
+                    'RCPT TO': re.compile(r'\[(.*?)\]\[(.*?)\] RCPT TO: <(.*?)>'),
+                    'DATA': re.compile(r'\[(.*?)\]\[(.*?)\] DATA \+ (.*)')
+                }
+                pattern_http = re.compile(r'\[(.*?)\]\[(.*?)\] (GET|Host|Connection|Cache-Control|Upgrade-Insecure-Requests|User-Agent|Accept|Accept-Encoding|Accept-Language|Cookie): (.*)')
+
+                data_mail = {}
+                data_http = {}
+
                 with open(log_file_path, 'r') as log_file:
                     for line in log_file:
-                        match = regex.match(line)
-                        if match:
-                            timestamp = match.group(1)
-                            ip_port = match.group(2)
-                            action = match.group(3)
-                            
-                            # Inicializar las acciones como diccionarios vacíos si no existen
-                            if ip_port not in data:
-                                data[ip_port] = {
-                                    'IP:Puerto': ip_port,
-                                    'HELO': None,
-                                    'MAIL FROM': None,
-                                    'RCPT TO': None,
-                                    'DATA': None
-                                }
-                            
-                            # Extraer HELO, MAIL FROM, RCPT TO y DATA si están presentes
-                            helo_match = re.search(r'HELO (.*)', action)
-                            mail_from_match = re.search(r'MAIL FROM: <(.*?)>', action)
-                            rcpt_to_match = re.search(r'RCPT TO: <(.*?)>', action)
-                            data_match = re.search(r'DATA \+ (.*)', action)
-                            
-                            if helo_match:
-                                data[ip_port]['HELO'] = helo_match.group(1)
-                            elif mail_from_match:
-                                data[ip_port]['MAIL FROM'] = mail_from_match.group(1)
-                            elif rcpt_to_match:
-                                data[ip_port]['RCPT TO'] = rcpt_to_match.group(1)
-                            elif data_match:
-                                data[ip_port]['DATA'] = data_match.group(1)
-                
-                # Convertir el diccionario en una lista de diccionarios
-                data_list = list(data.values())
-                
-                # Crear DataFrame a partir de la lista de diccionarios
-                df = pd.DataFrame(data_list)
-                    
-                
-                
-                # Renderizar la plantilla HTML y pasar el DataFrame como contexto
-                return render_template('show_results_mailoney.html', dataframe=df)
+                        matched = False
+                        for action, pattern in patterns_mail.items():
+                            match = pattern.match(line)
+                            if match:
+                                ip_port = match.group(2)
+                                value = match.group(3)
+                                if ip_port not in data_mail:
+                                    data_mail[ip_port] = {
+                                        'IP:Puerto': ip_port,
+                                        'HELO': None,
+                                        'MAIL FROM': None,
+                                        'RCPT TO': None,
+                                        'DATA': None
+                                    }
+                                data_mail[ip_port][action] = value
+                                matched = True
+                                break
+
+                        if not matched:
+                            match_http = pattern_http.match(line)
+                            if match_http:
+                                ip_port = match_http.group(2)
+                                header = match_http.group(3)
+                                value = match_http.group(4)
+
+                                if ip_port not in data_http:
+                                    data_http[ip_port] = {
+                                        'IP:Puerto': ip_port,
+                                        'Host': None,
+                                        'Connection': None,
+                                        'Cache-Control': None,
+                                        'Upgrade-Insecure-Requests': None,
+                                        'User-Agent': None,
+                                        'Accept': None,
+                                        'Accept-Encoding': None,
+                                        'Accept-Language': None,
+                                        'Cookie': None
+                                    }
+                                data_http[ip_port][header] = value
+
+
+                df_mail = pd.DataFrame(list(data_mail.values()))
+                df_http = pd.DataFrame(list(data_http.values()))
+
+                # Renderizar la plantilla HTML y pasar los DataFrames como contexto
+                return render_template('show_results_mailoney.html', dataframe_mail=df_mail, dataframe_http=df_http)
 
             except Exception as e:
                 print(f"Error al leer el archivo de registro: {e}")
                 return "Error al leer el archivo de registro", 500
-
         else:
             print("Archivo de registro no encontrado")
             return "Archivo de registro no encontrado", 404
-   # else:
-   #     print("Error al ejecutar comando docker")
-   #     return "Error al ejecutar comando docker", 500
+    else:
+        print("Error al ejecutar comando kubectl")
+        return "Error al ejecutar comando kubectl", 500
+
 
 
 @app.route('/graficos_cowrie')
