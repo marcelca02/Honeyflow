@@ -111,7 +111,7 @@ def ejecutar_pod():
     h_name = request.form['h_name']
     proceso = subprocess.run(['python3', f'app/create_pod_{h_name}.py'])
 
-	config.load_kube_config() # carga kube config
+    config.load_kube_config() # carga kube config
     v1 = client.CoreV1Api()
 
     pod_list = v1.list_pod_for_all_namespaces()
@@ -155,7 +155,7 @@ def stop_pod():
    # client = docker.from_env()
    # contenedor = client.containers.get(f'{h_name}')
    # contenedor.stop()
-	config.load_kube_config() # carga kube config
+    config.load_kube_config() # carga kube config
     v1 = client.CoreV1Api()
     v1.delete_namespaced_pod(name=h_name, namespace=None)
 
@@ -290,18 +290,21 @@ def show_results_heralding():
                 dataframe = pd.DataFrame(data)
                 # Filtrar los datos para crear un DataFrame específico para auth_attempts
                 # Crear un DataFrame para almacenar los datos de auth_attempts
-                auth_attempts_df = pd.DataFrame(columns=['timestamp', 'username', 'password'])
+                auth_attempts_df_list = []
 
-                # Crear un nuevo DataFrame para auth_attempts_df
                 if 'auth_attempts' in dataframe.columns:
                     auth_attempts_list = dataframe['auth_attempts'].tolist()
-                    auth_attempts_df_list = []
                     for auth_attempt in auth_attempts_list:
-                        auth_attempts_df = pd.DataFrame(auth_attempt)
-                        auth_attempts_df.columns = ['timestamp', 'username', 'password']
-                        auth_attempts_df_list.append(auth_attempts_df)
-                    auth_attempts_df = pd.concat(auth_attempts_df_list)
-                    dataframe.drop('auth_attempts', axis=1, inplace=True)
+                        # Verificar que auth_attempt no esté vacío y tenga las claves correctas
+                        if auth_attempt and all(k in auth_attempt[0] for k in ['timestamp', 'username', 'password']):
+                            temp_df = pd.DataFrame(auth_attempt)
+                            temp_df.columns = ['timestamp', 'username', 'password']
+                            auth_attempts_df_list.append(temp_df)
+                    
+                    if auth_attempts_df_list:
+                        auth_attempts_df = pd.concat(auth_attempts_df_list, ignore_index=True)
+                    else:
+                        auth_attempts_df = pd.DataFrame(columns=['timestamp', 'username', 'password'])
                 return render_template('show_results_heralding.html', dataframe=dataframe, auth_attempts_df=auth_attempts_df)
             except json.JSONDecodeError as error:
                         print(f"Error al leer archivo JSON: {error}")
