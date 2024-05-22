@@ -5,13 +5,25 @@
       <div class="container-fluid py-5">
 
         {% if running_honeypot%}
+          {% if isdocker %}
             <div class="alert alert-success" role="alert">
                 ¡El docker del honeypot ha sido parado con éxito!
             </div>
+          {% else %}
+            <div class="alert alert-success" role="alert">
+                ¡El pod del honeypot ha sido parado con éxito!
+            </div>
+          {% endif %}
         {% else %}
+          {% if isdocker %}
             <div class="alert alert-danger" role="alert">
                 ¡El docker del honeypot no esta corriendo!
             </div>
+          {% else %}
+            <div class="alert alert-danger" role="alert">
+                ¡El pod del honeypot no esta corriendo!
+            </div>
+          {% endif %}
         {% endif %}
       
         <!-- boton de volver -->

@@ -1,7 +1,5 @@
 
 # config.py
 
-INTERFACE = 'wlp2s0'
-CONTAINER_IP = '192.168.1.142'
-
-COWRIE_IMAGE = 'honeypot1:v1'
+INTERFACE = 'br-2690b16bd7b0'
+CONTAINER_IP = '172.18.0.2'
