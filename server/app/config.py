@@ -1,5 +1,5 @@
 
 # config.py
 
-INTERFACE = 'eth0'
-CONTAINER_IP = '172.16.4.54'
+INTERFACE = 'br-2690b16bd7b0'
+CONTAINER_IP = '172.18.0.2'
