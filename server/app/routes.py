@@ -117,8 +117,8 @@ def ejecutar_pod():
         proceso = subprocess.run(['python3', f'app/create_pod_{h_name}.py'])
     else:
         proceso = subprocess.run(['python3', f'app/run_docker_{h_name}.py'])
-        client = docker.from_env()
-        contenedor = client.containers.get(f'{h_name}')
+        clientdoc = docker.from_env()
+        contenedor = clientdoc.containers.get(f'{h_name}')
         time.sleep(5)
         if contenedor.status == 'running':
             docker_running_c = True
@@ -183,8 +183,8 @@ def stop_pod():
         return render_template('stop_honeypot.html', running_honeypot=False) 
 
     if h_name == 'cowrie':
-        client = docker.from_env()
-        contenedor = client.containers.get(f'{h_name}')
+        clientdoc = docker.from_env()
+        contenedor = clientdoc.containers.get(f'{h_name}')
         contenedor.stop()
     else:
         config.load_kube_config() # carga kube config
