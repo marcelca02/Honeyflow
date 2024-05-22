@@ -1,5 +1,4 @@
 import subprocess
-from app import kubernetes
 from kubernetes import client, config
 import threading 
 import time
