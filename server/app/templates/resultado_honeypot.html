@@ -12,7 +12,7 @@
               <div class="alert alert-success" role="alert">
                 ¡Pod iniciado con éxito!
               </div>
-
+            {% endif %}
           {% else %}
             {% if isdocker %}              
               <div class="alert alert-danger" role="alert">
@@ -22,6 +22,7 @@
               <div class="alert alert-danger" role="alert">
                 ¡Algo salió mal en la ejecución del pod!
               </div>
+            {% endif %}
           {% endif %}
 
         <!-- boton de volver -->
