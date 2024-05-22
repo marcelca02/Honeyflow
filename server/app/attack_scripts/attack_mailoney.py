@@ -62,9 +62,9 @@ async def enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, servidor
 async def main():
 	destinatario = "victima@gmail.com"
 	asunto = "Su cuenta ha sido comprometida"
-	cuerpo = "Estimado usuario, Su cuenta ha sido comprometida. Por favor, 
-			haga clic en el siguiente enlace para recuperar el acceso a su cuenta: 
-			http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte"
+	cuerpo = "Estimado usuario, Su cuenta ha sido comprometida. Por favor, " \
+			"haga clic en el siguiente enlace para recuperar el acceso a su " \
+			"cuenta: http://sitio.malicioso.com/recuperar. Atentamente, El equipo de soporte"
 	#servidor_smtp = "172.18.0.2"
 	puerto_smtp = 25
 
