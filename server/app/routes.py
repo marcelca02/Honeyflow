@@ -122,9 +122,9 @@ def ejecutar_pod():
         time.sleep(5)
         if contenedor.status == 'running':
             docker_running_c = True
-            return render_template('resultado_honeypot.html', exito=True)
+            return render_template('resultado_honeypot.html', exito=True, isdocker=True)
         else:
-            return render_template('resultado_honeypot.html', exito=False)
+            return render_template('resultado_honeypot.html', exito=False, isdocker=True)
 
     config.load_kube_config() # carga kube config
     v1 = client.CoreV1Api()
@@ -153,12 +153,12 @@ def ejecutar_pod():
             docker_running_h = True
         elif h_name == 'mailoney':
             docker_running_m = True
-        return render_template('resultado_honeypot.html', exito=True)
+        return render_template('resultado_honeypot.html', exito=True, isdocker=False)
     else:
         docker_running_h = False # no haria falta si ya es False por defecto
         docker_running_c = False 
         docker_running_m = False 
-        return render_template('resultado_honeypot.html', exito=False)
+        return render_template('resultado_honeypot.html', exito=False, isdocker=False)
 
 
 
@@ -176,11 +176,11 @@ def stop_pod():
     h_name = request.form['h_name']
 
     if h_name == 'cowrie' and docker_running_c == False:
-        return render_template('stop_honeypot.html', running_honeypot=False) 
+        return render_template('stop_honeypot.html', running_honeypot=False, isdocker=True) 
     elif h_name == 'heralding' and docker_running_h == False:
-        return render_template('stop_honeypot.html', running_honeypot=False) 
+        return render_template('stop_honeypot.html', running_honeypot=False, isdocker=False) 
     elif h_name == 'mailoney' and docker_running_m == False:
-        return render_template('stop_honeypot.html', running_honeypot=False) 
+        return render_template('stop_honeypot.html', running_honeypot=False, isdocker=False)
 
     if h_name == 'cowrie':
         clientdoc = docker.from_env()
@@ -199,7 +199,7 @@ def stop_pod():
     if h_name == 'mailoney':
         docker_running_m = False
 
-    return render_template('stop_honeypot.html', running_honeypot=True)
+    return render_template('stop_honeypot.html', running_honeypot=True, isdocker=(h_name=='cowrie'))
 
 
 @app.route('/k8s_cowrie')
