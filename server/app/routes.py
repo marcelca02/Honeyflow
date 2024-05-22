@@ -2,6 +2,7 @@ import subprocess
 from app import kubernetes
 from kubernetes import client, config
 import threading 
+import time
 import docker
 import json
 import os
@@ -112,27 +113,53 @@ def ejecutar_pod():
     global docker_running_m
 
     h_name = request.form['h_name']
-    proceso = subprocess.run(['python3', f'app/create_pod_{h_name}.py'])
+    if h_name != 'cowrie':
+        proceso = subprocess.run(['python3', f'app/create_pod_{h_name}.py'])
+    else:
+        proceso = subprocess.run(['python3', f'app/run_docker_{h_name}.py'])
+        client = docker.from_env()
+        contenedor = client.containers.get(f'{h_name}')
+        time.sleep(5)
+        if contenedor.status == 'running':
+            docker_running_c = True
+            return render_template('resultado_honeypot.html', exito=True)
+        else:
+            return render_template('resultado_honeypot.html', exito=False)
 
     config.load_kube_config() # carga kube config
     v1 = client.CoreV1Api()
 
-    pod_list = v1.list_pod_for_all_namespaces()
-    for pod in pod_list.items:
-        if pod.metadata.name == h_name:
-            if pod.status.phase == 'Running':
-                if h_name == 'cowrie':
-                    docker_running_c = True
-                elif h_name == 'heralding':
-                    docker_running_h = True
-                elif h_name == 'mailoney':
-                    docker_running_m = True
-                return render_template('resultado_honeypot.html', exito=True)
-            else:
-                docker_running_h = False # no haria falta si ya es False por defecto
-                docker_running_c = False 
-                docker_running_m = False 
-                return render_template('resultado_honeypot.html', exito=False)
+    # esperar a que el pod este en running
+    max_retries = 10
+    retry_count = 0
+    pod_running = False
+
+    while retry_count < max_retries:
+        pod_list = v1.list_pod_for_all_namespaces()
+        for pod in pod_list.items:
+            if pod.metadata.name == h_name:
+                if pod.status.phase == 'Running':
+                    pod_running = True
+                    break
+        if pod_running:
+            break
+        retry_count += 1
+        time.sleep(5)
+
+    if pod_running:
+        if h_name == 'cowrie':
+            docker_running_c = True
+        elif h_name == 'heralding':
+            docker_running_h = True
+        elif h_name == 'mailoney':
+            docker_running_m = True
+        return render_template('resultado_honeypot.html', exito=True)
+    else:
+        docker_running_h = False # no haria falta si ya es False por defecto
+        docker_running_c = False 
+        docker_running_m = False 
+        return render_template('resultado_honeypot.html', exito=False)
+
 
 
 #@app.route('/stop_honeypot')
@@ -155,12 +182,15 @@ def stop_pod():
     elif h_name == 'mailoney' and docker_running_m == False:
         return render_template('stop_honeypot.html', running_honeypot=False) 
 
-   # client = docker.from_env()
-   # contenedor = client.containers.get(f'{h_name}')
-   # contenedor.stop()
-    config.load_kube_config() # carga kube config
-    v1 = client.CoreV1Api()
-    v1.delete_namespaced_pod(name=h_name, namespace=None)
+    if h_name == 'cowrie':
+        client = docker.from_env()
+        contenedor = client.containers.get(f'{h_name}')
+        contenedor.stop()
+    else:
+        config.load_kube_config() # carga kube config
+        v1 = client.CoreV1Api()
+        nspace = 'default'
+        v1.delete_namespaced_pod(name=h_name, namespace=nspace)
 
     if h_name == 'cowrie':
         docker_running_c = False
