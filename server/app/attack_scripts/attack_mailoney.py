@@ -49,25 +49,8 @@ async def enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, servidor
         await writer.drain()
         #await reader.readuntil(b"354")
 
-	# enviar todo
-        # message = f"Subject: {asunto}\r\n"
-        # message += f"From: {remitente}\r\n"
-        # message += f"To: {destinatario}\r\n"
-        # message += "\r\n"  # Separator between headers and body
-        # message += cuerpo + "\r\n"
-        # message += ".\r\n"  # End-of-message signal
-        # writer.write(message)
-        # await writer.drain()
-        # await reader.readuntil(b"250")
-
-	# quit command
-        #writer.write(b"QUIT\r\n")
-        #await writer.drain()
-        #await reader.readuntil(b"221")
-
 	# close connection
         writer.close()
-        #await writer.waitclosed()
 
         print("[+] Correo electrónico malicioso enviado con éxito.")
     except Exception as e:
@@ -86,7 +69,7 @@ async def main():
 	remitente = "correofalso@gmail.com"
 	#enviar_correo_malicioso(remitente, destinatario, asunto, cuerpo, "172.18.0.3", puerto_smtp)
 
-	await enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, "172.18.0.3")
+	await enviar_correo_telnet(asunto, remitente, destinatario, cuerpo, "172.18.0.2")
 
 import asyncio
 
