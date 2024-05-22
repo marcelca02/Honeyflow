@@ -405,6 +405,12 @@ def show_results_mailoney():
 
 @app.route('/graficos_cowrie')
 def graficos_cowrie():
+    return render_template('graficos_cowrie.html')
+
+
+
+@app.route('/graficos_heralding')
+def graficos_heralding():
     # Definir el path del archivo JSON
     json_file_path = os.path.join('app', 'data_analysis', 'heralding', 'heralding.json')
 
@@ -463,12 +469,6 @@ def graficos_cowrie():
 
     else:
         return "Archivo JSON no encontrado", 404
-
-
-@app.route('/graficos_heralding')
-def graficos_heralding():
-    return render_template('graficos_heralding.html')
-
 @app.route('/graficos_mailoney')
 def graficos_mailoney():
     return render_template('graficos_mailoney.html')
